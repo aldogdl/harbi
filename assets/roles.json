@@ -1,0 +1,32 @@
+[
+    {
+        "tit": "COTIZADOR",
+        "role": "ROLE_COTZ",
+        "fil": "ext",
+        "pre": "cnet"
+    },
+    {
+        "tit": "SOLICITANTE",
+        "role": "ROLE_SOLZ",
+        "fil": "ext",
+        "pre": "snet"
+    },
+    {
+        "tit": "ASESOR DE VENTAS ONLINE",
+        "role": "ROLE_AVO",
+        "fil": "int",
+        "pre": "anet"
+    },
+    {
+        "tit": "ADMINISTRADOR",
+        "role": "ROLE_ADMIN",
+        "fil": "int",
+        "pre": "anet"
+    },
+    {
+        "tit": "EVALUADOR",
+        "role": "ROLE_EVAL",
+        "fil": "int",
+        "pre": "anet"
+    }
+]

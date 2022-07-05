@@ -1,0 +1,16 @@
+pendientes,Regristrar Piezas
+pendientes,Enviar Orden
+proceso,Orden en Fila
+proceso,Orden en revisión
+proceso,Rastreando Piezas
+proceso,Con Respuestas
+proceso,Procesando
+busqueda,En Rastreo
+evaluo,Pieza para Inventario
+evaluo,Aceptada
+compra,En Rastreo
+compra,Adquirida
+venta,En Proceso
+venta,En Ruta
+venta,Pagada
+venta,En Garantia

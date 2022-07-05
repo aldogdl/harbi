@@ -1,0 +1,8 @@
+pendientes,Registrando Orden
+proceso,Orden en Procesamiento
+busqueda,Buscando Piezas
+evaluo,En Evaluación
+compra,Rastreando y comprando Piezas
+venta,Comercializando Piezas
+extras,orden_x,Orden Rechazada
+extras,pza_rea,Pieza para Reasignar

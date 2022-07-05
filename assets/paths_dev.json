@@ -1,0 +1,100 @@
+{
+    "ver": "49",
+    "palcla": "0",
+    "portadas":10,
+    "folders_base": {
+        "share": "data_share",
+        "logs": "logs",
+        "udel": "udel",
+        "ordenes": "ords",
+        "scm_stage": "scm_stage",
+        "scm_tray": "scm_tray",
+        "scm_werr": "scm_werr",
+        "scm_hist": "scm_hist",
+        "scm_await": "scm_await",
+        "scm_sended": "scm_sended",
+        "scm_drash": "scm_drash",
+        "scm_msgs": "scm_msgs",
+        "data_ctcs": "data_ctcs"
+    },
+    "files": {
+        "harbi_connx": "folders_base::share::harbi_connx.json",
+        "cotizadores": "folders_base::share::cotz.json",
+        "centinela": "folders_base::share::centinela.json",
+        "connpass": "folders_base::share::connpass.json",
+        "connwho": "folders_base::share::connwho.json",
+        "cargos": "folders_base::share::cargos.json",
+        "autos": "folders_base::share::autos.json",
+        "roles": "folders_base::share::roles.json",
+        "rutas": "folders_base::share::rutas.json",
+        "logs": "folders_base::logs::logs.txt"
+    },
+    "portHarbi": 8081,
+    "portServer": 80,
+    "bases_dev": {
+        "server_remote": "https://_dom_.com/",
+        "server_local": "http://_ip_:_port_/_dom_/public_html/"
+    },
+    "bases_prod": {
+        "server_remote": "https://_dom_.com/",
+        "server_local": "http://_dom_.loc/"
+    },
+    "ftp": {
+        "u": "autoparn",
+        "p": "2536parnet"
+    },
+    "prefix_uris": {
+        "home_ctrl"      : "home-controller/",
+        "publics_harbi"  : "harbi/",
+        "publics_scp"    : "scp/",
+        "scm"            : "scm/",
+        "scp_centinela"  : "scp/centinela/",
+        "scp_cotizadores": "scp/cotizadores/",
+        "scp_solicitudes": "scp/solicitudes/",
+        "centinela_file" : "centinela/file/"
+    },
+    "api_harbi": [
+        "get_ipdb",
+        "get_path_prod_ver",
+        "get_path_prod",
+        "get_cargos",
+        "get_roles",
+        "get_autos",
+        "get_all_rutas",
+        "get_centinela",
+        "set_conection",
+        "get_ordenes"
+    ],
+    "uris": [
+        "home_ctrl::get-data-connection",
+        "publics_harbi::save-ip-address-harbi",
+        "publics_harbi::check-connx",
+        "publics_harbi::check-changes",
+        "publics_harbi::save-ruta-last",
+        "publics_harbi::get-orden-by-id",
+        "publics_harbi::get-user-by-campo",
+        "publics_harbi::get-all-autos",
+        "publics_harbi::download-centinela",
+        "publics_harbi::get-campaings",
+        "publics_harbi::get-all-ordspzas",
+        "publics_harbi::set-orden",
+        "publics_harbi::set-pieza",
+        "publics_harbi::get-all-cotz",
+        "publics_scp::get-all-contactos-by",
+        "publics_scp::get-orden-by-id",
+        "publics_scp::get-ordenes-by-avo",
+        "publics_scp::get-piezas-by-orden",
+        "publics_scp::seve-data-contact",
+        "publics_scp::get-all-contacts",
+        "publics_scp::delete-contacto",
+        "scp_solicitudes::editar-data-pieza",
+        "scp_solicitudes::set-new-campaing",
+        "scp_cotizadores::get-all-cotizadores",
+        "scp_centinela::change-stt-to-orden",
+        "scp_centinela::ordenes-asignadas",
+        "scp_centinela::build-status-bskpzas",
+        "centinela_file::get-all-data-by-id",
+        "scm::get-contacto-byid",
+        "scm::set-reg-envio"
+    ]
+}
