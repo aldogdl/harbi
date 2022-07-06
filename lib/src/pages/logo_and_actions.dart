@@ -14,7 +14,7 @@ class LogoAndActions extends StatelessWidget {
   Widget build(BuildContext context) {
     
     return Container(
-      width: 170,
+      width: 190,
       color: MyTheme.bgSec,
       child: Column(
         children: [

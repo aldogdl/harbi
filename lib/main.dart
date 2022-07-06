@@ -14,7 +14,7 @@ void main() {
   runApp(const Harbi());
   doWhenWindowReady(() {
     final win = appWindow;
-    const initialSize = Size(970.0, 118.0);
+    final initialSize = Size(win.size.width * 0.73, 118.0);
     win.minSize = initialSize;
     win.size = initialSize;
     win.alignment = Alignment.bottomRight;
