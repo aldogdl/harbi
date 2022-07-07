@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
-import 'package:harbi/src/providers/terminal_provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/terminal_provider.dart';
 import '../config/my_theme.dart';
 import '../widgets/win_botones.dart';
 
@@ -54,16 +55,16 @@ class LogoAndActions extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          const Text(
+          Text(
             'HARBI',
             textScaleFactor: 0.8,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: GoogleFonts.comfortaa(
               fontSize: 50,
               height: 1,
               color: Colors.blueGrey,
               fontWeight: FontWeight.bold
-            ),
+            )
           ),
         ],
       ),

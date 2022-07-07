@@ -2,25 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:provider/provider.dart';
 
+import 'src/config/globals.dart';
 import 'src/providers/socket_conn.dart';
 import 'src/providers/terminal_provider.dart';
 import 'src/config/sng_manager.dart';
 import 'src/pages/logo_and_actions.dart';
 import 'src/pages/my_app.dart';
+import 'src/services/get_paths.dart';
 
 void main() {
   
+  WidgetsFlutterBinding.ensureInitialized();
+
   sngManager();
-  runApp(const Harbi());
-  doWhenWindowReady(() {
-    final win = appWindow;
-    final initialSize = Size(win.size.width * 0.73, 118.0);
-    win.minSize = initialSize;
-    win.size = initialSize;
-    win.alignment = Alignment.bottomRight;
-    win.title = "HARBI";
-    win.show();
+  final globals = getSngOf<Globals>();
+
+  Size wsize = WidgetsBinding.instance.window.physicalSize;
+  doWhenWindowReady(() async {
+
+    if(globals.sizeWin.width == 0) {
+      globals.sizeWin = await GetPaths.screen(set: '${wsize.width} ${wsize.height}');
+    }else{
+      globals.sizeWin = await GetPaths.screen();
+    }
+    var w = globals.sizeWin.width * 0.73;
+    appWindow.title = "HARBI";
+    appWindow.minSize = Size(w, 118);
+    appWindow.size   = Size(w, 118);
+    appWindow.alignment = Alignment.bottomRight;
+    appWindow.show();
   });
+
+  runApp(const Harbi());
 }
 
 

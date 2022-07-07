@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/material.dart' show Size;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' as p;
 
@@ -90,6 +91,32 @@ class GetPaths {
   static String getPathRoot() {
     var context = p.Context(style: estiloPlatform);
     return context.join(Platform.environment['APPDATA']!, 'com.$package');
+  }
+
+  /// Guardamos u obtenemos el tamaño de la pantalla del dispositivo
+  static Future<Size> screen({String set = ''}) async {
+
+    String root = getPathRoot();
+    
+    final file = File('$root${getSep()}screen.txt');
+    if(file.existsSync()) {
+      final setOld = file.readAsStringSync();
+      if(setOld.isNotEmpty) {
+        set = setOld;
+      }else{
+        if(set.isNotEmpty) {
+          file.writeAsStringSync(set);
+        }
+      }
+    }else{
+      file.writeAsStringSync(set);
+    }
+    
+    if(set.isNotEmpty) {
+      final t = List<String>.from(set.split(' '));
+      return Size(double.parse(t.first), double.parse(t.last));
+    }
+    return const Size(1280, 720);
   }
 
   ///

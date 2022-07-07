@@ -1,8 +1,11 @@
 
+import 'package:flutter/material.dart' show Size;
+
 import '../entity/conectado.dart';
 
 class Globals {
 
+  Size sizeWin = const Size(0, 0);
   final String passH = '123H';
   String ipHarbi = '';
   int portHarbi = 8081;
