@@ -25,10 +25,13 @@ void main() {
     }else{
       globals.sizeWin = await GetPaths.screen();
     }
-    var w = globals.sizeWin.width * 0.73;
+
+    final wmn = globals.sizeWin.width * 0.73;
+    const h = 118.0;
     appWindow.title = "HARBI";
-    appWindow.minSize = Size(w, 118);
-    appWindow.size   = Size(w, 118);
+    appWindow.size   = Size(wmn, h);
+    appWindow.maxSize = Size(wmn, h);
+    appWindow.minSize = Size(wmn, h);
     appWindow.alignment = Alignment.bottomRight;
     appWindow.show();
   });

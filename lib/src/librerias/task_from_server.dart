@@ -101,15 +101,34 @@ class TaskFromServer {
     await MyHttp.get('$uri${_globals.versionCentinela}');
     if(!MyHttp.result['abort']) {
 
-      if(!MyHttp.result['body']['hay']){ return {}; }
-
       var r = Map<String, dynamic>.from(MyHttp.result['body']['changes']);
+
       bool save = false;
-      r.forEach((key, value) {
-        if(key != 'centinela') {
-          if(value.isNotEmpty) { save = true; }
+      if(r.containsKey('scm')) {
+        if(r['scm'].isNotEmpty) {
+          save = true;
         }
-      });
+      }
+
+      if(!save) {
+        if(r.containsKey('scmSee')) {
+          save = r['scmSee'];
+        }
+      }
+
+      if(!save) {
+        if(r.containsKey('scmResp')) {
+          save = r['scmResp'];
+        }
+      }
+
+      if(!save) {
+        if(r.containsKey('filtros')) {
+          if(r['filtros'].isNotEmpty) {
+            save = true;
+          }
+        }
+      }
 
       if(save) {
         r.putIfAbsent('misselanius', () => true);

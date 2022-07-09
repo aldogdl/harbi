@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:harbi/src/pages/terminal/cron_centinela.dart';
-import 'package:harbi/src/pages/terminal/down_centinela.dart';
 import 'package:provider/provider.dart';
 
+import 'cron_centinela.dart';
+import 'down_centinela.dart';
 import 'init_harbi.dart';
 import 'check_system.dart';
 import 'conect_socket.dart';

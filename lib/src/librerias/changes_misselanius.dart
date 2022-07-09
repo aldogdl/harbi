@@ -33,6 +33,7 @@ class ChangesMisselanius {
 
       final lst = pathToLog.listSync();
       for (var i = 0; i < lst.length; i++) {
+
         Uri uri = Uri.file(lst[i].path, windows: true);
         final segs = uri.pathSegments;
         if(segs.last.startsWith(nameFile)) {
@@ -43,6 +44,9 @@ class ChangesMisselanius {
       }
     }
 
+    bool goForScmSee = false;
+    bool goForScmResp = false;
+    
     if(_changes.isNotEmpty) {
       for (var i = 0; i < _changes.length; i++) {
         if(_changes[i].containsKey('scm')) {
@@ -51,12 +55,39 @@ class ChangesMisselanius {
         if(_changes[i].containsKey('filtros')) {
           _filtros.addAll(List<int>.from(_changes[i]['filtros']));
         }
+        if(_changes[i].containsKey('scmSee')) {
+          goForScmSee = _changes[i]['scmSee'];
+        }
+        if(_changes[i].containsKey('scmResp')) {
+          goForScmResp = _changes[i]['scmResp'];
+        }
       } 
     }
 
     if(_campas.isNotEmpty) { await _hasCampaniasNew(prov); }
     if(_filtros.isNotEmpty) { await _hasFiltrosNew(prov);  }
+    if(goForScmSee) { await _goForScmSee(prov); }
+    if(goForScmResp) { await _goForScmResp(prov); }
+
     _changes = [];
+  }
+
+  /// Revisamos si hay nuevas descargas y vistas de cotizadores
+  static Future<void> _goForScmSee(TerminalProvider prov) async {
+
+    prov.setAccs('> Iniciando proceso [REGSCMSEE]');
+    Ejecuta.exe('regScmSee', args: []);
+    prov.setAccs('[^] Se requiere de NOTIFICACIÓN');
+    prov.requiredNotiff = true;
+  }
+
+  /// Revisamos si hay nuevas respuestas de cotizadores a solicitudes
+  static Future<void> _goForScmResp(TerminalProvider prov) async {
+
+    prov.setAccs('> Iniciando proceso [REGSCMRESP]');
+    Ejecuta.exe('regScmResp', args: []);
+    prov.setAccs('[^] Se requiere de NOTIFICACIÓN');
+    prov.requiredNotiff = true;
   }
 
   /// Revisamos si hay nuevas campañas

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'conectados.dart';
 import 'data_conection.dart';
-import 'terminal/terminales.dart';
+import 'terminales/terminales.dart';
 import '../config/my_theme.dart';
 
 class MyApp extends StatelessWidget {

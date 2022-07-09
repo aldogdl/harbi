@@ -200,21 +200,20 @@ class _CronCentinelaState extends State<CronCentinela> {
       final isTime = _tprov.isTime(ti);
       if(isTime >= _globals.revCada) {
 
-        final has = await TaskFromServer.checkCambionEnCentinela(_uri);
         _tprov.lastCheck = ti;
         _tprov.cantChecks = _tprov.cantChecks +1;
         _tprov.setAccs('> ULTIMO CHEQUEO [${ti.day} ${ti.hour}:${ti.minute}:${ti.second} #${_tprov.cantChecks}]');
+
+        final has = await TaskFromServer.checkCambionEnCentinela(_uri);
         _sendNotificationUpdateTime();
-        if(has.isNotEmpty) {
 
-          if(has.containsKey('err')) {
-            _tprov.setAccs('[X] Error al CHECAR ver. centinela');
-          }else{
+        if(has.containsKey('err')) {
+          _tprov.setAccs('[X] Error al CHECAR ver. centinela');
+        }else{
 
-            if(has.containsKey('misselanius') && has['misselanius']) { ChangesMisselanius.check(_tprov); }
+          if(has.containsKey('misselanius') && has['misselanius']) { ChangesMisselanius.check(_tprov); }
 
-            if(has['centinela']) { _tprov.secc = 'downCent'; }
-          }
+          if(has['centinela']) { _tprov.secc = 'downCent'; }
         }
       }
     }else{
