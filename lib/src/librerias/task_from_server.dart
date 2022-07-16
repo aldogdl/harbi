@@ -1,9 +1,8 @@
 import 'dart:io';
 import 'dart:convert';
 
-import 'package:harbi/src/config/sng_manager.dart';
-import 'package:harbi/src/librerias/changes_misselanius.dart';
-
+import '../config/sng_manager.dart';
+import '../librerias/changes_misselanius.dart';
 import '../config/globals.dart';
 import '../services/get_paths.dart';
 import '../services/my_http.dart';
@@ -98,11 +97,10 @@ class TaskFromServer {
   ///
   static Future<Map<String, dynamic>> checkCambionEnCentinela(String uri) async {
 
-    await MyHttp.get('$uri${_globals.versionCentinela}');
+    await MyHttp.get('$uri${_globals.versionCentinela}');    
     if(!MyHttp.result['abort']) {
 
-      var r = Map<String, dynamic>.from(MyHttp.result['body']['changes']);
-
+      var r = Map<String, dynamic>.from(MyHttp.result['body']);
       bool save = false;
       if(r.containsKey('scm')) {
         if(r['scm'].isNotEmpty) {
@@ -137,7 +135,7 @@ class TaskFromServer {
       return r;
     }
 
-    return {'err':'.'};
+    return {'err':MyHttp.result['body']};
   }
 
 }

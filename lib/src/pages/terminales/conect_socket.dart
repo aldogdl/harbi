@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:harbi/src/providers/terminal_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'terminal_skel.dart';
+import '../../providers/terminal_provider.dart';
 import '../../providers/socket_conn.dart';
 import 'txt_terminal.dart';
 

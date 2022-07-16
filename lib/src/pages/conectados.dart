@@ -67,20 +67,38 @@ class Conectados extends StatelessWidget {
   Widget _conectado(Map<String, dynamic> c) {
 
     const sp = SizedBox(width: 8);
-    
+    List<String> prefix = ['Ing.', 'Lic.', 'Sr.', 'Sra.'];
+    String name = c['name'];
+    for (var i = 0; i < prefix.length; i++) {
+      if(name.startsWith(prefix[i])) {
+        name = name.replaceFirst(prefix[i], '').trim();
+        break;
+      }
+    }
+    if(name.length > 14) {
+      name = name.substring(0, 14);
+      name = '$name...';
+    }
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 5),
-      child: Row(
+      child: Column(
         children: [
-          const Icon(Icons.double_arrow_sharp, size: 10, color: MyTheme.txtOrange),
-          const SizedBox(width: 5),
-          _texto(c['name']),
-          sp,
-          _texto(c['app'], color: MyTheme.txtOrange),
-          const Spacer(),
-          _texto(c['idCon']),
+          Row(
+            children: [
+              const Icon(Icons.double_arrow_sharp, size: 10, color: MyTheme.txtOrange),
+              const SizedBox(width: 5),
+              _texto(name),
+              sp,
+              _texto(c['app'], color: MyTheme.txtOrange),
+              const Spacer(),
+              _texto(c['idCon']),
+            ],
+          ),
+          if(c['app'] == 'SCM')
+            const Divider(height: 3, color: Colors.orange)
         ],
-      ),
+      )
     );
   }
 

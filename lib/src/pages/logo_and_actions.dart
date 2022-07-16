@@ -55,17 +55,27 @@ class LogoAndActions extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          Text(
-            'HARBI',
-            textScaleFactor: 0.8,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.comfortaa(
-              fontSize: 50,
-              height: 1,
-              color: Colors.blueGrey,
-              fontWeight: FontWeight.bold
-            )
-          ),
+          Text.rich(
+            TextSpan(
+              text: 'HARBI ',
+              style: GoogleFonts.comfortaa(
+                fontSize: 38,
+                height: 1,
+                color: Colors.blueGrey,
+                fontWeight: FontWeight.bold
+              ),
+              children: const [
+                TextSpan(
+                  text: ' v. 1.0.5',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.amber
+                  )
+                )
+              ]
+            ),
+            textScaleFactor: 1,
+          )
         ],
       ),
     );

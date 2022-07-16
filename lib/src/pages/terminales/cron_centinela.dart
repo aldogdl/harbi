@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:harbi/src/librerias/conectados_check.dart';
 import 'package:provider/provider.dart';
 import 'package:cron/cron.dart';
 
@@ -10,6 +9,7 @@ import '../../config/sng_manager.dart';
 import '../../config/globals.dart';
 import '../../entity/request_event.dart';
 import '../../librerias/task_from_server.dart';
+import '../../librerias/conectados_check.dart';
 import '../../librerias/changes_misselanius.dart';
 import '../../providers/terminal_provider.dart';
 import '../../providers/socket_conn.dart';
@@ -208,7 +208,11 @@ class _CronCentinelaState extends State<CronCentinela> {
         _sendNotificationUpdateTime();
 
         if(has.containsKey('err')) {
-          _tprov.setAccs('[X] Error al CHECAR ver. centinela');
+          String err = '[X] Error al CHECAR ver. centinela';
+          if(has['err'].isNotEmpty) {
+            err = '[X] ${has['err']}';
+          }
+          _tprov.setAccs(err);
         }else{
 
           if(has.containsKey('misselanius') && has['misselanius']) { ChangesMisselanius.check(_tprov); }

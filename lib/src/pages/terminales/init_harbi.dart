@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:harbi/src/librerias/changes_misselanius.dart';
 import 'package:provider/provider.dart';
 
 import 'terminal_skel.dart';
 import 'txt_terminal.dart';
 import '../../../socket_server.dart';
+
 import '../../config/my_theme.dart';
+import '../../librerias/changes_misselanius.dart';
 import '../../librerias/task_from_server.dart';
 import '../../librerias/files_ex.dart';
 import '../../librerias/make_rutas.dart';

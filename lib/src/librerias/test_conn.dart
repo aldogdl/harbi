@@ -1,9 +1,9 @@
-import 'package:harbi/src/providers/terminal_provider.dart';
 
 import 'test_connection.dart';
-import '../services/get_paths.dart';
 import '../config/globals.dart';
 import '../config/sng_manager.dart';
+import '../services/get_paths.dart';
+import '../providers/terminal_provider.dart';
 
 class TestConn {
 

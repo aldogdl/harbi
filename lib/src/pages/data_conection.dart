@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:harbi/src/config/globals.dart';
-import 'package:harbi/src/config/sng_manager.dart';
 import 'package:provider/provider.dart';
 
+import '../config/sng_manager.dart';
+import '../config/globals.dart';
 import '../config/my_theme.dart';
 import '../providers/socket_conn.dart';
 
@@ -21,7 +21,7 @@ class DataConection extends StatelessWidget {
       child: Column(
         children: [
           _texto(
-            'Herramienta ANET, Revisión Bidireccional Inteligente',
+            'Herramienta AUTOPARNET, Revisión Bidireccional Inteligente',
             color: const Color.fromARGB(255, 4, 153, 108),
             isCenter: true
           ),
@@ -34,8 +34,8 @@ class DataConection extends StatelessWidget {
             ]
           else
             _texto(
-              'Administra las conexiones, cambios del servidor de Autoparnet.com '
-              'y comunica a todos sus miembros.',
+              'Administra conexiones, cambios en el servidor '
+              'y comunica a sus miembros.',
               isCenter: true
             )
         ],
