@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
    <application
-        android:label="harbi"
+        android:label="Harbi 1.0.5"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
