@@ -1,0 +1,8 @@
+ver,2
+1,Registrando Orden
+2,Orden en Procesamiento
+3,Buscando Piezas
+4,En Almacén
+5,Comercializando Piezas
+6,En Garantia
+7,Facturación

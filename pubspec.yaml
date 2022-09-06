@@ -1,0 +1,56 @@
+name: harbi
+description: Herramienta AUTOPARNET, Revisión Bidireccional Inteligente
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# Para cambiar la version completamente, Archivos Afectados
+# lib\src\config\globals.dart | Line: 8
+# android\app\build.gradle    | Line: 21
+# Este archivo
+version: 1.2.2+0
+
+environment:
+  sdk: '>=2.18.0 <3.0.0'
+
+dependencies:
+  archive: ^3.3.1
+  bitsdojo_window: ^0.1.4
+  cron: ^0.5.0
+  cupertino_icons: ^1.0.2
+  flutter:
+    sdk: flutter
+  ftpconnect: ^1.0.1
+  get_it: ^7.2.0
+  get_server: ^1.2.1
+  google_fonts: ^3.0.1
+  http: ^0.13.5
+  network_info_plus: ^2.1.4+1
+  path: ^1.8.2
+  path_provider: ^2.0.11
+  provider: ^6.0.3
+  web_socket_channel: ^2.2.0
+
+dev_dependencies:
+  flutter_launcher_icons: ^0.10.0
+  flutter_lints: ^2.0.1
+  flutter_test:
+    sdk: flutter
+
+flutter_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/icon.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icon.png
+    - assets/logo_dark.png
+    - assets/estaciones.txt
+    - assets/bin.zip
+    - assets/estatus.txt
+    - assets/cargos.json
+    - assets/roles.json
+    - assets/paths_dev.json
+    - assets/testings_scm.json
+    - assets/scm_msgs/

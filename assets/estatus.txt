@@ -1,0 +1,13 @@
+1,Regristrar Piezas
+1,Enviar Orden
+2,Orden en Fila
+2,Orden en Revisión
+3,En Rastreo
+4,En Evaluación
+4,En Mostrador
+5,En Recolección y Proceso
+5,En Ruta
+6,En Proceso,
+6,Reasignada,
+6,Cancelada,
+7,Vendida
