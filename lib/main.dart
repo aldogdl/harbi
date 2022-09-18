@@ -13,7 +13,6 @@ import 'src/services/get_paths.dart';
 void main() async {
   
   WidgetsFlutterBinding.ensureInitialized();
-
   sngManager();
   Size wsize = WidgetsBinding.instance.window.physicalSize;
 
@@ -39,7 +38,6 @@ void main() async {
 
   runApp(const Harbi());
 }
-
 
 ///
 class Harbi extends StatelessWidget {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../config/sng_manager.dart';
 import '../config/globals.dart';
@@ -30,12 +32,6 @@ class _DataConectionState extends State<DataConection> {
   @override
   Widget build(BuildContext context) {
 
-    String loc = '...';
-    if(!_globals.bdLocal.contains('_ip_')) {
-      Uri uri = Uri.parse(_globals.bdLocal);
-      loc = uri.host;
-    }
-
     return Container(
       margin: const EdgeInsets.all(5),
       padding: const EdgeInsets.symmetric(horizontal: 3),
@@ -44,17 +40,19 @@ class _DataConectionState extends State<DataConection> {
         children: [
           if(context.watch<SocketConn>().isConnectedSocked)
             ...[
-              _row('IP HARBI:', '${_globals.ipHarbi}:${_globals.portHarbi}'),
-              _row('B.D. Local:', loc),
               _row('SIDD:', _globals.wifiName),
-              _row('Harbi_bins:', 'Versión: ${_globals.harbiBin}')
+              _row('TIPO Conexión:', _globals.typeConn),
+              _row('IP HARBI:', '${_globals.ipHarbi}:${_globals.portHarbi}'),
+              _row('BINARIOS:', 'Versión: ${_globals.harbiBin}')
             ]
           else
-            _texto(
-              'Herramienta AUTOPARNET, Revisión Bidireccional Inteligente',
-              isCenter: true
-            ),
-          const Divider(height: 10, color: Colors.grey),
+            ...[
+              _texto(
+                'Herramienta AUTOPARNET, Revisión Bidireccional Inteligente',
+                isCenter: true
+              ),
+              const Divider(height: 10, color: Colors.grey)
+            ],
           FutureBuilder(
             future: _losSize,
             builder: (_, AsyncSnapshot snap) {
@@ -62,7 +60,13 @@ class _DataConectionState extends State<DataConection> {
               if(snap.connectionState == ConnectionState.done) {
                 return Tooltip(
                   message: 'App: ${_globals.sizeWin.width * _globals.widMax} x ${_globals.heiMax}0',
-                  child: _row('Dispositivo:', '${_globals.sizeWin.width} x ${_globals.sizeWin.height} pxs.')
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: InkWell(
+                      onTap: () async => await _openFileSizeScreen(),
+                      child: _row('DISPLAY:', '${_globals.sizeWin.width} x ${_globals.sizeWin.height} pxs.'),
+                    ),
+                  )
                 );
               }
               return _row('Dispositivo;', 'Calculando...');
@@ -93,8 +97,8 @@ class _DataConectionState extends State<DataConection> {
   ///
   Widget _texto(
     String texto,
-    {Color color = MyTheme.txtMain, bool isCenter = false}
-  ) {
+    {Color color = MyTheme.txtMain, bool isCenter = false}) 
+  {
 
     return Text(
       texto,
@@ -116,6 +120,16 @@ class _DataConectionState extends State<DataConection> {
       _globals.sizeWin = snap;
     }else{
       _globals.sizeWin = tmp;
+    }
+  }
+
+  ///
+  Future<void> _openFileSizeScreen() async {
+
+    final file = await GetPaths.getFileScreen();
+    if (!await launchUrl(Uri.file(file.path))) {
+      print('No se pudo lanzar ${file.path}');
+      throw 'Could not launch ${file.path}';
     }
   }
 

@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'dart:convert';
 
-import '../providers/terminal_provider.dart';
 import 'get_paths.dart';
 import 'my_http.dart';
 import '../config/sng_manager.dart';
 import '../config/globals.dart';
+import '../providers/terminal_provider.dart';
 import '../librerias/f_cron_centinela/changes_misselanius.dart';
 
 class TaskFromServer {

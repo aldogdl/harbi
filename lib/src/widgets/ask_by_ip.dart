@@ -118,7 +118,6 @@ class _AskByIpState extends State<AskByIp> {
               fontWeight: FontWeight.bold
             ),
             onEditingComplete: () => _hacerPrueba(),
-            onSubmitted: (v) => _hacerPrueba(),
             decoration: InputDecoration(
               border: _borde(),
               focusedBorder: _borde(color: Colors.blue),
@@ -193,15 +192,12 @@ class _AskByIpState extends State<AskByIp> {
   Future<void> _hacerPrueba() async {
 
     final nav = Navigator.of(context);
-    _accions.value = '[-] Haciendo Prueba con: ${_txtIp.text}';
-    await Future.delayed(const Duration(milliseconds: 200));
-
     bool isOk = (widget.tipo == 'local') ? await _pbLocal() : await _pbRemota();
     if(isOk) {
       if(nav.canPop()) { nav.pop(true); }
       return;
     }
-    
+
     _accions.value = '[X] Error de conexión, Inténtalo nuevamente';
   }
 
@@ -234,7 +230,6 @@ class _AskByIpState extends State<AskByIp> {
 
     if(_isValid()) {
       String ip = _txtIp.text.trim().toLowerCase();
-      if(!ip.startsWith('http')) { ip = 'http://$ip/'; }
       _globals.ipHarbi = ip;
       String res = await TestConn.local(widget.tprov);
       if(res == 'ok') { return _accOk(); }

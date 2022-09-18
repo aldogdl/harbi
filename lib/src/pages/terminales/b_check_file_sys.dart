@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:harbi/src/librerias/b_check_file_sys/binarios_harbi_zip.dart';
 import 'package:provider/provider.dart';
 
 import '../../librerias/b_check_file_sys/files_ex.dart';
 import '../../librerias/b_check_file_sys/make_rutas.dart';
 import '../../librerias/b_check_file_sys/my_paths.dart';
+import '../../librerias/b_check_file_sys/binarios_harbi_zip.dart';
 import '../../widgets/terminal_skel.dart';
 import '../../widgets/txt_terminal.dart';
 import '../../services/task_from_server.dart';

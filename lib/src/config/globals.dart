@@ -5,7 +5,7 @@ import '../entity/conectado.dart';
 
 class Globals {
 
-  String harbiV  = '1.2.2';
+  String harbiV  = '1.3.0';
   String harbiBin= '';
   double widMax = 0.73;
   double heiMax = 118.0;
@@ -17,6 +17,7 @@ class Globals {
   final String passH = '123H';
   
   String ipHarbi = '';
+  String typeConn = '';
   int portHarbi = 8081;
   int portdb = 80;
   String wifiName = 'Oculto';

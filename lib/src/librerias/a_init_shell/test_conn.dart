@@ -29,9 +29,43 @@ class TestConn {
   /// Probamos primero la conexión local para ver si las url o ip son correctas
   static Future<String> local(TerminalProvider prov) async {
 
+    prov.setAccs('> Buscando AnetDB con: ${_globals.ipHarbi}');
+    final uriL = '${_globals.ipHarbi}:${_globals.portdb}/autoparnet/public_html/';
+    final res = await MyHttp.goUri('http://$uriL$base');
+    return await _analizarResult(res, 'LOCAL', prov );
+  }
+
+  ///
+  static Future<String> _analizarResult(String result, String tipo, TerminalProvider? prov) async {
+
+    if (result.startsWith('http')) {
+      if(tipo == 'REMOTA') {
+        _globals.bdRemota = bdTest;
+      }else{
+        _globals.bdLocal = bdTest;
+      }
+      if(prov != null) {
+        prov.setAccs('[√] Conexión $tipo Exitosa');
+        await Future.delayed(const Duration(milliseconds: 250));
+      }
+      return 'ok';
+    }else{
+
+      if(tipo == 'REMOTA') { _globals.workOnlyLocal = true; }
+
+      if(prov != null) {
+        prov.setAccs('[X] ${_globals.ipHarbi} ${_globals.typeConn} Inalcansable.');
+        await Future.delayed(const Duration(milliseconds: 250));
+      }
+    }
+    return 'bad';
+  }
+
+  ///
+  static Future<String> setIpGlobal() async {
+
     String isOk = 'sin';
     bdTest = '';
-
     final pathP = await GetPaths.getContentFilePaths(isProd: true);
     if(pathP != null) {
       if(pathP.isNotEmpty) {
@@ -45,10 +79,8 @@ class TestConn {
 
     _globals.bdLocal = 'http://_ip_:_port_/_dom_/public_html/';
     if(bdTest.isNotEmpty) {
-      prov.setAccs('> Test con uri ALMACENADA');
-      prov.setAccs('[!] $bdTest');
       isOk = await MyHttp.goUri('$bdTest$base');
-      isOk = _analizarResult(isOk, 'LOCAL', prov);
+      isOk = await _analizarResult(isOk, 'LOCAL', null);
       if(isOk == 'ok') {
         return isOk;
       }
@@ -60,30 +92,7 @@ class TestConn {
       bdTest = bdTest.replaceAll('_port_', '${_globals.portdb}');
       bdTest = bdTest.replaceAll('_dom_', GetPaths.package);
     }
-  
-    prov.setAccs('> Test con uri NUEVA');
-    prov.setAccs('[!] $bdTest');
-    isOk = await MyHttp.goUri('$bdTest$base');
-    isOk = _analizarResult(isOk, 'LOCAL', prov);
+
     return isOk;
   }
-
-  ///
-  static String _analizarResult(String result, String tipo, TerminalProvider prov) {
-
-    if (result.startsWith('http')) {
-      if(tipo == 'REMOTO') {
-        _globals.bdRemota = bdTest;
-      }else{
-        _globals.bdLocal = bdTest;
-      }
-      prov.setAccs('[√] Conexión $tipo Exitosa');
-      return 'ok';
-    }else{
-      _globals.workOnlyLocal = (tipo == 'REMOTO') ? true : false;
-      prov.setAccs('[X] ERROR, NO HAY CONEXIÓN $tipo');
-      return 'ask_${tipo.toLowerCase()}';
-    }
-  }
-
 }

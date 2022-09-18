@@ -33,11 +33,18 @@ class Conectados extends StatelessWidget {
   ///
   Widget _sinConn() {
 
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 0),
-      child: Image(
-        image: AssetImage('assets/logo_dark.png'),
-        fit: BoxFit.contain,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 0),
+      child: Selector<TerminalProvider, bool>(
+        selector: (_, prov) => prov.isPausado,
+        builder: (_, value, __) {
+
+          final logo = (value) ? 'logo_dark' : 'logo';
+          return Image(
+            image: AssetImage('assets/$logo.png'),
+            fit: BoxFit.contain,
+          );
+        },
       ),
     );
   }

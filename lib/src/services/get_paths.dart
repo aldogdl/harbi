@@ -149,6 +149,17 @@ class GetPaths {
     return Size(double.parse(t.first), double.parse(t.last));
   }
 
+  /// Recuperamos el Archivo Screen
+  static Future<File> getFileScreen() async {
+
+    String root = getPathRoot();
+    final file = File('$root${getSep()}screen.txt');
+    if(!file.existsSync()) {
+      file.writeAsStringSync('Sin Data');
+    }
+    return file;
+  }
+
   ///
   static Future<void> deleteFilePathsProd() async {
     File paths = File('${getPathRoot()}${getSep()}$nameFilePathsP');
