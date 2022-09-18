@@ -258,6 +258,7 @@ class GetPaths {
       'remoto': paths['base_r'],
       'ipHarbi': globals.ipHarbi,
       'ptoHarbi': globals.portHarbi,
+      'typeConx': globals.typeConn,
       'pto-loc': paths['uri'],
     };
   }

@@ -61,38 +61,4 @@ class TestConn {
     return 'bad';
   }
 
-  ///
-  static Future<String> setIpGlobal() async {
-
-    String isOk = 'sin';
-    bdTest = '';
-    final pathP = await GetPaths.getContentFilePaths(isProd: true);
-    if(pathP != null) {
-      if(pathP.isNotEmpty) {
-        if(pathP.containsKey('server_local')) {
-          if(!pathP['server_local'].contains('_ip_')) {
-            bdTest = pathP['server_local'];
-          }
-        }
-      }
-    }
-
-    _globals.bdLocal = 'http://_ip_:_port_/_dom_/public_html/';
-    if(bdTest.isNotEmpty) {
-      isOk = await MyHttp.goUri('$bdTest$base');
-      isOk = await _analizarResult(isOk, 'LOCAL', null);
-      if(isOk == 'ok') {
-        return isOk;
-      }
-    }
-
-    if(_globals.bdLocal.contains('_ip_')) {
-      bdTest = _globals.bdLocal;
-      bdTest = bdTest.replaceAll('_ip_', _globals.ipHarbi);
-      bdTest = bdTest.replaceAll('_port_', '${_globals.portdb}');
-      bdTest = bdTest.replaceAll('_dom_', GetPaths.package);
-    }
-
-    return isOk;
-  }
 }

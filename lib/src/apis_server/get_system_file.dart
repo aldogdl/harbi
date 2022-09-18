@@ -183,6 +183,7 @@ class GetSysemFile extends GetView {
       'base_l': mapa['server_local'],
       'port_h': mapa['portHarbi'],
       'port_s': mapa['portServer'],
+      'type_c': _globals.typeConn,
     };
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:harbi/src/config/globals.dart';
 import 'package:harbi/src/config/sng_manager.dart';
+import 'package:harbi/src/services/get_paths.dart';
 import 'package:harbi/src/widgets/multi_conn_ok.dart';
 import 'package:provider/provider.dart';
 
@@ -111,7 +112,16 @@ class _InitShellState extends State<InitShell> {
         tprod.setAccs('[X] NO HAY CONEXIÓN a AnetDB');
         await _testConIpDelUser('local');
       }else{
-        await _multiConnsWithExito(tprod);
+        // A esta altura todas las conexiones encontradas en la variable 
+        // _multiConn ya estan probadas y aprobadas, por lo tanto, solo es
+        // necesario que el usuario seleccione la adecuada.
+        if(_multiConn.length > 1) {
+          await _multiConnsWithExito(tprod);
+        }else{
+          globals.ipHarbi  = _multiConn.first['ip'];
+          globals.typeConn = _multiConn.first['interface'];
+          globals.bdLocal  = 'http://${globals.ipHarbi}:${globals.portdb}/${GetPaths.package}/public_html/';
+        }
       }
 
       if(globals.ipHarbi.isNotEmpty) {

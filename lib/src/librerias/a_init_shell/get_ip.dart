@@ -11,8 +11,13 @@ class GetIp {
 
     Map<String, dynamic> interfaces = {};
     /// Recuperamos todas las interfaces existentes
-    
-    interfaces['wifiName'] = await info.getWifiName() ?? 'Oculta';
+    try {
+      
+      interfaces['wifiName'] = await info.getWifiName() ?? 'Oculta';
+    } catch (_) {
+      interfaces['wifiName'] = 'AutoparNet';
+    }
+
     interfaces['interfaces'] = await _getAllInterfaces();
     return interfaces;
   }
@@ -28,7 +33,12 @@ class GetIp {
       type: InternetAddressType.IPv4
     );
 
-    final ipWi = await info.getWifiIP() ?? '';
+    late String ipWi;
+    try {
+      ipWi = await info.getWifiIP() ?? '';
+    } catch (_) {
+      ipWi = '';
+    }
 
     List<Map<String, dynamic>> maines = [];
 

@@ -5,6 +5,7 @@ import '../config/sng_manager.dart';
 import '../config/globals.dart';
 import '../librerias/a_init_shell/test_conn.dart';
 import '../providers/terminal_provider.dart';
+import '../services/get_paths.dart';
 
 /// Usado cuando se detectaron varias conexiones a la red local con Exito
 /// Se le pedirá al usuario utilizar una de ellas como global y principal 
@@ -116,6 +117,7 @@ class _MultiConnsOkState extends State<MultiConnsOk> {
               onPressed: (){
                 _globals.ipHarbi = ips['ip'];
                 _globals.typeConn = tipo;
+                _globals.bdLocal  = 'http://${_globals.ipHarbi}:${_globals.portdb}/${GetPaths.package}/public_html/';
                 _selecteIPdOfList();
               },
               icon: const Icon(Icons.check_circle_outline_outlined, color: Colors.green),
@@ -280,6 +282,7 @@ class _MultiConnsOkState extends State<MultiConnsOk> {
     final nav = Navigator.of(context);
     bool isOk = await _pbLocal();
     if(isOk) {
+      _globals.bdLocal  = 'http://${_globals.ipHarbi}:${_globals.portdb}/${GetPaths.package}/public_html/';
       if(nav.canPop()) { nav.pop(true); }
       return;
     }
