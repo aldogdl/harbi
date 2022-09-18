@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -128,7 +127,7 @@ class _DataConectionState extends State<DataConection> {
 
     final file = await GetPaths.getFileScreen();
     if (!await launchUrl(Uri.file(file.path))) {
-      print('No se pudo lanzar ${file.path}');
+      // print('No se pudo lanzar ${file.path}');
       throw 'Could not launch ${file.path}';
     }
   }
