@@ -97,7 +97,7 @@
         "publics_scp::get-ids-ordenes-by-avo",
         "publics_scp::get-piezas-by-orden",
         "publics_scp::get-resps-by-pzas",
-        "publics_scp::seve-data-contact",
+        "publics_scp::guardar-datos-empcontac",
         "publics_scp::get-all-contacts",
         "publics_scp::delete-contacto",
         "scp_solicitudes::set-reg-campaing-scm",
