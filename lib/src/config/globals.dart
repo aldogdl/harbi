@@ -5,7 +5,7 @@ import '../entity/conectado.dart';
 
 class Globals {
 
-  String harbiV  = '1.3.1';
+  String harbiV  = '1.3.2';
   String harbiBin= '';
   double widMax = 0.73;
   double heiMax = 118.0;
