@@ -15,9 +15,25 @@ class HarbiFTP {
   static Map<String, dynamic> oldCenti = {};
 
   /// Retornamos el manifiesto del cambio reciente
+  static Future<String> downFileFiltros(
+    String pathFileDown, String toPath, TerminalProvider prov) async 
+  {
+    final result = await _downFileFtp(pathFileDown, toPath, prov);
+    if(result != 4) {
+      final filtros = await _downFileHttp(pathFileDown, prov, 'download_filtros');
+      if(filtros.isNotEmpty) {
+        final file = File(await GetPaths.getFileByPath(toPath));
+        file.writeAsStringSync(json.encode(filtros));
+      }
+    }
+
+    return 'ok';
+  }
+
+  /// Retornamos el manifiesto del cambio reciente
   static Future<String> downFile(
-    String pathFileDown, String toPath, TerminalProvider prov
-  ) async {
+    String pathFileDown, String toPath, TerminalProvider prov) async 
+  {
 
     final file = File(await GetPaths.getFileByPath(toPath));
     if(file.existsSync()) {
@@ -28,7 +44,37 @@ class HarbiFTP {
       }
     }
 
-    final centi = await _downFileFtp(pathFileDown, toPath, prov);
+    Map<String, dynamic> centi = {};
+    final result = await _downFileFtp(pathFileDown, toPath, prov);
+    if(result == 0) {
+      prov.setAccs('> Recuperando Schema Centinela.');
+      await Future.delayed(const Duration(milliseconds: 250));
+      centi = await _buildCentinelaViaHttp(pathFileDown, toPath, prov);
+    }
+
+    if(result == 3) {
+      centi = await _downFileHttp(pathFileDown, prov, 'download_centinela');
+      if(centi.isEmpty) {
+        prov.setAccs('[X] ERROR de Descarga TOTAL');
+      }else{
+        prov.setAccs('[√] Descarga HTTP exitosa');
+        file.writeAsStringSync(json.encode(centi));
+        await setVersionOnGlobals();
+      }
+    }
+
+    if(result == 4) {
+      final inFile = file.readAsStringSync();
+      if(inFile.isNotEmpty) {
+        final dataCenti = json.decode(inFile);
+        if(dataCenti.isNotEmpty){
+          centi = Map<String, dynamic>.from(dataCenti);
+        }else{
+          centi = {};
+        }
+      }
+    }
+
     if(centi.isNotEmpty) {
       globals.versionCentinela = '${centi['version']}';
       prov.currentVersion = '${centi['version']}';
@@ -41,13 +87,12 @@ class HarbiFTP {
   }
 
   /// Retornamos el manifiesto del cambio reciente
-  static Future<Map<String, dynamic>> _downFileFtp(
-    String pathFileDown, String toPath, TerminalProvider prov
-  ) async {
+  static Future<int> _downFileFtp(
+    String pathFileDown, String toPath, TerminalProvider prov) async 
+  {
 
     bool res = false;
     String conn = 'same';
-    Map<String, dynamic> data = {};
 
     try {
       final cd = await ftpConnect.currentDirectory();
@@ -65,7 +110,7 @@ class HarbiFTP {
         prov.setAccs('[√] Conexión FTP exitosa');
       }
 
-      prov.setAccs('> Revisando Existencia de Centinela');
+      prov.setAccs('> Revisando Existencia de ${toPath.toUpperCase()}');
       int existe = 1;
       try {
         existe = ( await ftpConnect.existFile(pathFileDown) ) ? 1 : 0;
@@ -75,22 +120,22 @@ class HarbiFTP {
 
       if(existe == 2) {
         prov.setAccs('[X] Error de conección FTP');
-        await ftpConnect.disconnect();
-        return {};
+        try {
+          await ftpConnect.disconnect();
+        } catch (_) {}
+        return existe;
       }
 
       if(existe == 0) {
-        prov.setAccs('[X] Centinela Inexistente');
-        await Future.delayed(const Duration(milliseconds: 250));
-        prov.setAccs('> Recuperando Schema Centinela.');
+        prov.setAccs('[X] ${toPath.toUpperCase()} Inexistente');
         try {
           await ftpConnect.disconnect();
-          return await _buildCentinelaViaHttp(pathFileDown, toPath, prov);
         } catch (_) {}
+        return existe;
       }
 
       if(existe == 1) {
-        prov.setAccs('> Descargando centinela...');
+        prov.setAccs('> Descargando ${toPath.toUpperCase()}...');
         try {
           res = await ftpConnect.downloadFileWithRetry(pathFileDown, File(pLocalFile));
           await ftpConnect.disconnect();
@@ -98,39 +143,23 @@ class HarbiFTP {
       }
 
     }else{
-      prov.setAccs('[X] ERROR de Descarga centinela');
+      prov.setAccs('[X] ERROR de Descarga ${toPath.toUpperCase()}');
+      return 0;
     }
 
     if(!res) {
       prov.setAccs('[X] ERROR de Descarga vía FTP');
-      data = await _downFileHttp(pathFileDown, toPath, prov);
-      if(data.isEmpty) {
-        prov.setAccs('[X] ERROR de Descarga TOTAL');
-      }else{
-        prov.setAccs('[√] Descarga HTTP exitosa');
-      }
+      return 3;
     }else{
-
-      final file = File(pLocalFile);
       prov.setAccs('[√] Descarga FTP exitosa');
-      final inFile = file.readAsStringSync();
-      if(inFile.isNotEmpty) {
-        final dataCenti = json.decode(inFile);
-        if(dataCenti.isNotEmpty){
-          data = Map<String, dynamic>.from(dataCenti);
-        }else{
-          data = {};
-        }
-      }
+      return 4;
     }
-
-    return data;
   }
 
   /// Retornamos el manifiesto del cambio reciente
   static Future<Map<String, dynamic>> _buildCentinelaViaHttp(
-    String pathFileDown, String toPath, TerminalProvider prov
-  ) async {
+    String pathFileDown, String toPath, TerminalProvider prov ) async 
+  {
 
     prov.setAccs('> Construyendo vía HTTP');
 
@@ -155,24 +184,20 @@ class HarbiFTP {
 
   /// Retornamos el manifiesto del cambio reciente
   static Future<Map<String, dynamic>> _downFileHttp(
-    String pathFileDown, String toPath, TerminalProvider prov
-  ) async {
+    String pathFileDown, TerminalProvider prov, String uri) async 
+  {
 
     prov.setAccs('> Descargando vía HTTP');
 
-    String fileName = await GetPaths.getFileByPath(toPath);    
-    String uri = await GetPaths.getUri(
-      'download_centinela', isLocal: globals.workOnlyLocal
+    String url = await GetPaths.getUri(
+      uri, isLocal: globals.workOnlyLocal
     );
-    await MyHttp.get(uri);
+    await MyHttp.get(url);
 
     if (!MyHttp.result['abort']) {
       final content = (MyHttp.result['body'].isEmpty) ? {} : MyHttp.result['body'];
       if(content.isNotEmpty) {
-        final resBody = Map<String, dynamic>.from(content);
-        File(fileName).writeAsStringSync(json.encode(resBody));
-        await setVersionOnGlobals();
-        return resBody;
+        return Map<String, dynamic>.from(content);
       }
     }
     return {};

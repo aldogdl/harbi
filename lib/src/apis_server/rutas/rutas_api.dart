@@ -1,6 +1,7 @@
 import 'package:get_server/get_server.dart';
-import 'package:harbi/src/apis_server/cotz_api.dart';
 
+import '../centinela_scp_api.dart';
+import '../cotz_api.dart';
 import '../get_system_file.dart';
 import '../ordenes_api.dart';
 import '../push_socket.dart';
@@ -23,7 +24,8 @@ class RutasApi {
       {'method':'post','path':'/$api/set_conection',    'page': _getSysF('setConnection')},
       {'method':'get','path':'/$api/get_cotz_by_id/:id','page': CotzApi()},
       {'method':'get','path':'/$api/push/:fnc',         'page': PushSocket()},
-      {'method':'get','path':'/$api/get_ordenes/:ords', 'page': OrdenesApi(fnc: 'getOrdenesByIds')}
+      {'method':'get','path':'/$api/get_ordenes/:ords', 'page': OrdenesApi(fnc: 'getOrdenesByIds')},
+      {'method':'get','path':'/$api/centinela_get/:fnc','page': CentinelaScpApi()}
     ];
   }
 

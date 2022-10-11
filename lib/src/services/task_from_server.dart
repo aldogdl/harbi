@@ -197,15 +197,9 @@ class TaskFromServer {
 
       if(!save) {
         if(r.containsKey('filNtg')) {
-          if(r['filNtg'] > 9) {
+          if(r['filNtg']) {
             save = true;
           }
-        }
-      }
-
-      if(!save) {
-        if(r.containsKey('filCnm')) {
-          save = r['filCnm'];
         }
       }
 

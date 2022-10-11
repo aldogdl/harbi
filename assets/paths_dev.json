@@ -1,5 +1,5 @@
 {
-    "ver": "16",
+    "ver": "21",
     "palcla": "0",
     "portadas":10,
     "portHarbi": 0,
@@ -30,6 +30,7 @@
     },
     "files": {
         "testings": "folders_base::testings_scm.json",
+        "notengo": "folders_base::share::filnotgo.json",
         "harbi_connx": "folders_base::share::harbi_connx.json",
         "cotizadores": "folders_base::share::cotz.json",
         "centinela": "folders_base::share::centinela.json",
@@ -38,6 +39,7 @@
         "connwho": "folders_base::share::connwho.json",
         "cargos": "folders_base::share::cargos.json",
         "autos": "folders_base::share::autos.json",
+        "piezas": "folders_base::share::piezas.json",
         "roles": "folders_base::share::roles.json",
         "rutas": "folders_base::share::rutas.json",
         "logs": "folders_base::logs::logs.txt"
@@ -64,7 +66,8 @@
         "set_conection",
         "get_cotz_by_id",
         "push",
-        "get_ordenes"
+        "get_ordenes",
+        "centinela_get"
     ],
     "uris": [
         "home_ctrl::get-data-connection",
@@ -77,6 +80,7 @@
         "publics_harbi::get-all-autos",
         "publics_harbi::build-centinela-schema",
         "publics_harbi::download-centinela",
+        "publics_harbi::download-filtros",
         "publics_harbi::get-campaings",
         "publics_harbi::get-all-ordspzas",
         "publics_harbi::set-orden",
@@ -86,10 +90,12 @@
         "publics_harbi::get-filesreg-of",
         "publics_harbi::get-all-campings",
         "publics_harbi::get-resp-by-ids",
+        "publics_harbi::get-resp-centinela",
         "publics_harbi::set-regs-byids",
         "publics_harbi::get-regs-push-see-byids",
         "publics_harbi::set-new-campaing",
         "publics_harbi::set-ests-stts",
+        "publics_harbi::get-regs-receivers-by-id-camp",
         "publics_scp::get-resp-por-ids",
         "publics_scp::get-all-contactos-by",
         "publics_scp::get-orden-by-id",

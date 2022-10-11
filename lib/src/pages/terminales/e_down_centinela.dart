@@ -58,9 +58,9 @@ class _DownCentinelaState extends State<DownCentinela> {
     tprod.setAccs('> Conectando FTP Centinela');
     final resp = await HarbiFTP.downFile('centinela.json', 'centinela', tprod);
     if(resp == 'err') {
-
       tprod.setAccs('[X] Archivo Centinela no existe o error en Descarga');
     }else{
+      
       tprod.setAccs('[√] DESCARGA EXITOSA.');
       await Future.delayed(const Duration(milliseconds: 250));
 

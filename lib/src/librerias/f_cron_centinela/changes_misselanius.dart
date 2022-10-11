@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 
+import '../e_down_centinela/harbi_ftp.dart';
 import '../run_exe.dart';
 import '../../services/get_paths.dart';
 import '../../providers/terminal_provider.dart';
@@ -50,24 +51,23 @@ class ChangesMisselanius {
     bool goForScmSee = false;
     bool goForScmResp = false;
     bool goForFiltros = false;
-    
+
     if(_changes.isNotEmpty) {
 
       for (var i = 0; i < _changes.length; i++) {
-        
+
         if(_changes[i].containsKey('camping')) {
           _campas = _changes[i]['camping'];
         }
+
         if(_changes[i].containsKey('filNtg')) {
-          prov.setAccs('> [ ${_changes[i]['filNtg'] } ] FILTROS NT Detectados');
-          goForFiltros = (_changes[i]['filNtg'] > 9) ? true : false;
+          goForFiltros = _changes[i]['filNtg'];
         }
-        if(_changes[i].containsKey('filCnm')) {
-          goForFiltros = _changes[i]['filCnm'];
-        }
+        
         if(_changes[i].containsKey('scmSee')) {
           goForScmSee = _changes[i]['scmSee'];
         }
+
         if(_changes[i].containsKey('scmResp')) {
           goForScmResp = _changes[i]['scmResp'];
         }
@@ -136,10 +136,17 @@ class ChangesMisselanius {
   }
 
   ///
-  static Future<void> _goForFiltros(TerminalProvider prov) async {
+  static Future<void> _goForFiltros(TerminalProvider tprod) async {
 
-    prov.setAccs('> Iniciando proceso [NEWFILTROS]');
-    RunExe.start('newfiltros', args: []);
+    tprod.setAccs('> Descargando nuevos [FILTROS]');
+    
+    final resp = await HarbiFTP.downFileFiltros('filnotgo.json', 'notengo', tprod);
+    if(resp == 'err') {
+      tprod.setAccs('[X] Archivo Filtros no existe o error en Descarga');
+    }else{
+      tprod.setAccs('[√] DESCARGA [FILTROS] EXITOSA.');
+      await Future.delayed(const Duration(milliseconds: 250));
+    }
   }
 
 }
