@@ -11,45 +11,68 @@ class FilesEx {
     List<String> sep = [GetPaths.getSep()];
 
     //<---- ESTACIONES DE TRABAJOS ---->
-    var content = await GetPaths.getContentAssetsBy('harbis.json');
-    if (content.isNotEmpty) {
-      String path = await GetPaths.getFileByPath('harbis');
-      if(path.isNotEmpty) {
+    String content = '';
+    try {
+      content = await GetPaths.getContentAssetsBy('harbis.json');
+      if (content.isNotEmpty) {
+        String path = await GetPaths.getFileByPath('harbis');
+        if(path.isNotEmpty) {
+          File(path).writeAsStringSync(
+            json.encode(json.decode(content))
+          );
+        }
+      }
+    } catch (e) {
+      setLog('[files_ex::crear::harbis.json] -> ${e.toString()}');
+    }
+    
+    //<---- CARGOS ---->
+    try {
+      content = await GetPaths.getContentAssetsBy('cargos.json');
+      if (content.isNotEmpty) {
+        String path = await GetPaths.getFileByPath('cargos');
         File(path).writeAsStringSync(
           json.encode(json.decode(content))
         );
       }
+    } catch (e) {
+      setLog('[files_ex::crear::cargos.json] -> ${e.toString()}');
     }
     
-    //<---- CARGOS ---->
-    content = await GetPaths.getContentAssetsBy('cargos.json');
-    if (content.isNotEmpty) {
-      String path = await GetPaths.getFileByPath('cargos');
-      File(path).writeAsStringSync(
-        json.encode(json.decode(content))
-      );
-    }
-
     //<---- TESTINGS ---->
-    content = await GetPaths.getContentAssetsBy('testings_scm.json');
-    if (content.isNotEmpty) {
-      String path = await GetPaths.getFileByPath('testings');
-      File(path).writeAsStringSync(
-        json.encode(json.decode(content))
-      );
+    try {
+      content = await GetPaths.getContentAssetsBy('testings_scm.json');
+      if (content.isNotEmpty) {
+        String path = await GetPaths.getFileByPath('testings');
+        File(path).writeAsStringSync(
+          json.encode(json.decode(content))
+        );
+      }
+    } catch (e) {
+      setLog('[files_ex::crear::testings_scm.json] -> ${e.toString()}');
     }
-
+    
     //<---- ROLES ---->
-    content = await GetPaths.getContentAssetsBy('roles.json');
-    if (content.isNotEmpty) {
-      String path = await GetPaths.getFileByPath('roles');
-      File(path).writeAsStringSync(
-        json.encode(json.decode(content))
-      );
+    try {
+      content = await GetPaths.getContentAssetsBy('roles.json');
+      if (content.isNotEmpty) {
+        String path = await GetPaths.getFileByPath('roles');
+        File(path).writeAsStringSync(
+          json.encode(json.decode(content))
+        );
+      }
+    } catch (e) {
+      setLog('[files_ex::crear::roles.json] -> ${e.toString()}');
     }
+    
 
     //<---- MENSAJES CAMPAÑAS ---->
-    await _buildMsgSCM(sep.first);
+    try {
+      await _buildMsgSCM(sep.first);
+    } catch (e) {
+      setLog('[files_ex::crear::_buildMsgSCM] -> ${e.toString()}');
+    }
+    
   }
 
   ///
@@ -81,4 +104,23 @@ class FilesEx {
     }
   }
 
+  ///
+  static void setLog(String msgErr) {
+
+    final logP = GetPaths.getPathsFolderTo('logs');
+    if(logP != null && logP.existsSync()) {
+
+      List<String> content = [];
+      String f = 'create_extras_errors.json';
+      final file = File('${logP.path}${ GetPaths.getSep() }$f');
+      if(file.existsSync()) {
+        final txt = file.readAsStringSync();
+        if(txt.isNotEmpty) {
+          content = List<String>.from(json.decode(txt));
+        }
+      }
+      content.add(msgErr);
+      file.writeAsStringSync(json.encode(content));
+    }
+  }
 }

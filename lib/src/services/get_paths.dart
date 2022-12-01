@@ -49,7 +49,7 @@ class GetPaths {
       Uri uri = Uri.file(pathExe);
       final partes = List<String>.from(uri.pathSegments);
       partes.removeLast();
-      pathExe = partes.join(Platform.pathSeparator);
+      pathExe = partes.join(sep.first);
       pathExe = p.join(pathExe, 'data', 'flutter_assets', folder, subFold);
       return Directory(pathExe);
     }
@@ -59,11 +59,11 @@ class GetPaths {
   static Future<String> getContentAssetsBy(String filename) async {
     
     final dir = getDirectoryAssets();
-    final file = File('${dir.path}$filename');
+    final file = File('${dir.path}${getSep()}$filename');
     if(file.existsSync()) {
       return file.readAsStringSync();
     }
-    return await rootBundle.loadString('assets/$filename', cache: false);
+    return await rootBundle.loadString('assets${getSep()}$filename', cache: false);
   }
 
   /// Recuperamos la data del archivo de paths que se comparte entre sistemas

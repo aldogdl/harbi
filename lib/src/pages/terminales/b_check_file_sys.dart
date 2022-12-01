@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:harbi/src/services/get_paths.dart';
 import 'package:provider/provider.dart';
 
 import '../../librerias/b_check_file_sys/files_ex.dart';
@@ -67,7 +68,15 @@ class _CheckFileSysState extends State<CheckFileSys> {
 
     tprod.setAccs('> Creando archivos Extras');
     await Future.delayed(const Duration(milliseconds: 250));
-    await FilesEx.crear();
+    try {
+      await FilesEx.crear();
+    } catch (e) {
+
+      tprod.setAccs('X ERROR creando archivos Extras');
+      final asset = GetPaths.getDirectoryAssets();
+      tprod.setAccs('> ${asset.path}');
+      FilesEx.setLog('> Folder Assets ${asset.path}');
+    }
 
     tprod.setAccs('> Creando Estaciones y Status');
     await Future.delayed(const Duration(milliseconds: 250));
