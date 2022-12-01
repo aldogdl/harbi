@@ -30,8 +30,14 @@ class TestConn {
   static Future<String> local(TerminalProvider prov) async {
 
     prov.setAccs('> Buscando AnetDB con: ${_globals.ipHarbi}');
-    final uriL = '${_globals.ipHarbi}:${_globals.portdb}/autoparnet/public_html/';
-    final res = await MyHttp.goUri('http://$uriL$base');
+    String uriL = '';
+    if(_globals.ipHarbi.contains('public_html')) {
+      uriL = _globals.ipHarbi;
+    }else{
+      uriL = 'http://${_globals.ipHarbi}:${_globals.portdb}/autoparnet/public_html/';
+    }
+
+    final res = await MyHttp.goUri('$uriL$base');
     return await _analizarResult(res, 'LOCAL', prov );
   }
 
@@ -50,8 +56,6 @@ class TestConn {
       }
       return 'ok';
     }else{
-
-      if(tipo == 'REMOTA') { _globals.workOnlyLocal = true; }
 
       if(prov != null) {
         prov.setAccs('[X] ${_globals.ipHarbi} ${_globals.typeConn} Inalcansable.');

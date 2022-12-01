@@ -1,9 +1,8 @@
 import 'dart:io';
 import 'dart:convert';
 
-import 'package:harbi/src/apis_server/rutas/rutas_api.dart';
-import 'package:harbi/src/config/sng_manager.dart';
-
+import '../../apis_server/rutas/rutas_api.dart';
+import '../../config/sng_manager.dart';
 import '../../config/globals.dart';
 import '../../providers/terminal_provider.dart';
 import '../../services/get_paths.dart';
@@ -12,6 +11,17 @@ class MyPaths {
 
   static final _globals = getSngOf<Globals>();
   
+  /// Construimos los paths del sistema desde el archivo principal path
+  static Future<void> crearInit(TerminalProvider proc) async {
+    
+    await _buildFolderRoot();
+    Map<String, dynamic>? pathsFile = await GetPaths.getContentFilePaths();
+    if(pathsFile != null) {
+      await _makeInit(pathsFile);
+      proc.setAccs('[√] Paths Construidas');
+    }
+  }
+
   /// Construimos los paths del sistema desde el archivo principal path
   static Future<void> crear(TerminalProvider proc) async {
     
@@ -24,33 +34,32 @@ class MyPaths {
         if (pathsFileP.isNotEmpty) {
           
           if ('${pathsFileP['ver']}' == '${pathsFile['ver']}') {
-            
-            proc.setAccs('[!] Corroborando Ip y Url');
-            bool save = await _checkDataConnect(GetPaths.nameFilePathsP);
-            if(save) {
-              await _checkDataConnect(GetPaths.nameFilePathsPS);
+            if('${pathsFileP['portHarbi']}' != '0') {
+              if('${pathsFileP['ip_harbi']}' != '') {
+                proc.setAccs('[!] Corroborando Ip y Url');
+                bool save = await _checkDataConnect(GetPaths.nameFilePathsP);
+                if(save) {
+                  await _checkDataConnect(GetPaths.nameFilePathsPS);
+                  proc.setAccs('[√] Chequeo Ip y Url Exitoso');
+                }
+                proc.setAccs('[√] Sin cambios en Paths');
+                return;
+              }
             }
-            proc.setAccs('[√] Chequeo Ip y Url Exitoso');
-            pathsFile = null;
           }
         }
       }
     }
-    
-    if (pathsFile == null) {
-      proc.setAccs('[√] Sin cambios en Paths');
-    }else{
-      
-      if(!_globals.ipHarbi.contains('.')) {
-        await Future.delayed(const Duration(milliseconds: 1000));
-        proc.setAccs('[X] No hay una IP asignada');
-        return;
-      }
-      proc.setAccs('[-] Reconstruyendo Paths');
+
+    if(!_globals.ipHarbi.contains('.')) {
       await Future.delayed(const Duration(milliseconds: 1000));
-      await _make(pathsFile);
-      proc.setAccs('[√] Paths Construidas');
+      proc.setAccs('[X] No hay una IP asignada');
+      return;
     }
+    proc.setAccs('[-] Reconstruyendo Paths');
+    await Future.delayed(const Duration(milliseconds: 1000));
+    await _make(pathsFile!);
+    proc.setAccs('[√] Paths Construidas');
   }
 
   ///
@@ -61,6 +70,46 @@ class MyPaths {
     if (!dirRoot.existsSync()) {
       dirRoot.create();
     }
+  }
+
+  ///
+  static Future<void> _makeInit(Map<String, dynamic> pathsP) async {
+
+    List<String> sep = [GetPaths.getSep()];
+    
+    Map<String, dynamic> build = pathsP;
+    String myAppData = GetPaths.getPathRoot();
+
+    //<---- FOLDERS ---->
+    Map<String, dynamic>.from(pathsP['folders_base']).forEach((key, value) {
+      Directory dirShare = Directory('$myAppData${sep.first}$value');
+      if (!dirShare.existsSync()) {
+        dirShare.createSync();
+      }
+    });
+
+    //<---- ARCHIVOS ---->
+    pathsP['files'].forEach((key, value) {
+      final partes = value.split('::');
+      String path = '';
+      if (partes.length > 2) {
+        path = '${pathsP[partes.first][partes[1]]}${sep.first}${partes.last}';
+      } else {
+        path = '${partes.last}';
+      }
+      File f = File('$myAppData${sep.first}$path');
+      if (!f.existsSync()) {
+        f.createSync();
+      }
+      build[key] = '$myAppData${sep.first}$path';
+    });
+
+    //<---- GUARDAMOS LOS ARCHIVOS RESULTANTES ---->
+    String path = '$myAppData${sep.first}${GetPaths.nameFilePathsP}';
+    File paths = File(path);
+    paths.writeAsStringSync(json.encode(build));
+    paths.createSync();
+    return;
   }
 
   ///
@@ -199,4 +248,6 @@ class MyPaths {
 
     return save;
   }
+
+
 }

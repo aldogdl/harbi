@@ -10,24 +10,31 @@ import '../../services/my_http.dart';
 
 class HarbiFTP {
 
-  static Globals globals = getSngOf<Globals>();
+  static final globals = getSngOf<Globals>();
   static late FTPConnect ftpConnect;
   static Map<String, dynamic> oldCenti = {};
 
-  /// Retornamos el manifiesto del cambio reciente
+  /// 
   static Future<String> downFileFiltros(
-    String pathFileDown, String toPath, TerminalProvider prov) async 
+    String pathFileDown, String toPath) async 
   {
-    final result = await _downFileFtp(pathFileDown, toPath, prov);
+    int result = -1;
+    String res = 'ok';
+    if(globals.env != 'dev') {
+      result = await _downFileFtp(pathFileDown, toPath);
+    }
+
     if(result != 4) {
-      final filtros = await _downFileHttp(pathFileDown, prov, 'download_filtros');
+      final filtros = await _downFileHttp(pathFileDown, 'download_filtros');
       if(filtros.isNotEmpty) {
         final file = File(await GetPaths.getFileByPath(toPath));
         file.writeAsStringSync(json.encode(filtros));
+      }else{
+        res = '$result';
       }
     }
 
-    return 'ok';
+    return res;
   }
 
   /// Retornamos el manifiesto del cambio reciente
@@ -44,8 +51,16 @@ class HarbiFTP {
       }
     }
 
+    int result = -1;
+    if(globals.env == 'dev') {
+      result = (oldCenti.isEmpty) ? 0 : 3;
+    }
+
     Map<String, dynamic> centi = {};
-    final result = await _downFileFtp(pathFileDown, toPath, prov);
+    if(globals.env != 'dev') {
+      result = await _downFileFtp(pathFileDown, toPath);
+    }
+
     if(result == 0) {
       prov.setAccs('> Recuperando Schema Centinela.');
       await Future.delayed(const Duration(milliseconds: 250));
@@ -53,7 +68,7 @@ class HarbiFTP {
     }
 
     if(result == 3) {
-      centi = await _downFileHttp(pathFileDown, prov, 'download_centinela');
+      centi = await _downFileHttp(pathFileDown, 'download_centinela');
       if(centi.isEmpty) {
         prov.setAccs('[X] ERROR de Descarga TOTAL');
       }else{
@@ -75,22 +90,12 @@ class HarbiFTP {
       }
     }
 
-    if(centi.isNotEmpty) {
-      globals.versionCentinela = '${centi['version']}';
-      prov.currentVersion = '${centi['version']}';
-    }else{
-      globals.versionCentinela = '0';
-      prov.currentVersion = '0';
-    }
-
     return 'ok';
   }
 
   /// Retornamos el manifiesto del cambio reciente
-  static Future<int> _downFileFtp(
-    String pathFileDown, String toPath, TerminalProvider prov) async 
+  static Future<int> _downFileFtp(String pathFileDown, String toPath) async 
   {
-
     bool res = false;
     String conn = 'same';
 
@@ -106,11 +111,6 @@ class HarbiFTP {
     final pLocalFile = await GetPaths.getFileByPath(toPath);
     if (conn == 'ok' || conn == 'same') {
 
-      if(conn == 'ok') {
-        prov.setAccs('[√] Conexión FTP exitosa');
-      }
-
-      prov.setAccs('> Revisando Existencia de ${toPath.toUpperCase()}');
       int existe = 1;
       try {
         existe = ( await ftpConnect.existFile(pathFileDown) ) ? 1 : 0;
@@ -119,7 +119,6 @@ class HarbiFTP {
       }
 
       if(existe == 2) {
-        prov.setAccs('[X] Error de conección FTP');
         try {
           await ftpConnect.disconnect();
         } catch (_) {}
@@ -127,7 +126,6 @@ class HarbiFTP {
       }
 
       if(existe == 0) {
-        prov.setAccs('[X] ${toPath.toUpperCase()} Inexistente');
         try {
           await ftpConnect.disconnect();
         } catch (_) {}
@@ -135,7 +133,6 @@ class HarbiFTP {
       }
 
       if(existe == 1) {
-        prov.setAccs('> Descargando ${toPath.toUpperCase()}...');
         try {
           res = await ftpConnect.downloadFileWithRetry(pathFileDown, File(pLocalFile));
           await ftpConnect.disconnect();
@@ -143,15 +140,12 @@ class HarbiFTP {
       }
 
     }else{
-      prov.setAccs('[X] ERROR de Descarga ${toPath.toUpperCase()}');
       return 0;
     }
 
     if(!res) {
-      prov.setAccs('[X] ERROR de Descarga vía FTP');
       return 3;
     }else{
-      prov.setAccs('[√] Descarga FTP exitosa');
       return 4;
     }
   }
@@ -163,7 +157,7 @@ class HarbiFTP {
 
     prov.setAccs('> Construyendo vía HTTP');
 
-    String fileName = await GetPaths.getFileByPath(toPath);    
+    String fileName = await GetPaths.getFileByPath(toPath);
     String uri = await GetPaths.getUri('build_centinela_schema', isLocal: false);
 
     await MyHttp.get(uri);
@@ -184,14 +178,11 @@ class HarbiFTP {
 
   /// Retornamos el manifiesto del cambio reciente
   static Future<Map<String, dynamic>> _downFileHttp(
-    String pathFileDown, TerminalProvider prov, String uri) async 
+    String pathFileDown, String uri) async 
   {
 
-    prov.setAccs('> Descargando vía HTTP');
-
-    String url = await GetPaths.getUri(
-      uri, isLocal: globals.workOnlyLocal
-    );
+    bool isLoc = (globals.env == 'dev') ? true : false;
+    String url = await GetPaths.getUri(uri, isLocal: isLoc);
     await MyHttp.get(url);
 
     if (!MyHttp.result['abort']) {
@@ -234,7 +225,6 @@ class HarbiFTP {
       data['url'],
       user: data['u'],
       pass: data['p'],
-      isSecured: data['ssl']
     );
 
     try {

@@ -21,6 +21,7 @@ class _DataConectionState extends State<DataConection> {
   final _globals = getSngOf<Globals>();
   late Future _losSize;
 
+
   @override
   void initState() {
 
@@ -39,8 +40,13 @@ class _DataConectionState extends State<DataConection> {
         children: [
           if(context.watch<SocketConn>().isConnectedSocked)
             ...[
-              _row('SIDD:', _globals.wifiName),
-              _row('TIPO Conexión:', _globals.typeConn),
+              Selector<SocketConn, int>(
+                selector: (_, prov) => prov.cantInPush,
+                builder: (_, val, __) {
+                  return _rowSnp('SNP:', val);
+                },
+              ),
+              _row('${_globals.typeConn}:', _globals.wifiName),
               _row('IP HARBI:', '${_globals.ipHarbi}:${_globals.portHarbi}'),
               _row('BINARIOS:', 'Versión: ${_globals.harbiBin}')
             ]
@@ -71,6 +77,30 @@ class _DataConectionState extends State<DataConection> {
               return _row('Dispositivo;', 'Calculando...');
             }
           )
+        ],
+      ),
+    );
+  }
+
+  ///
+  Widget _rowSnp(String label, int value) {
+
+    value = value -1;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 3),
+      child: Row(
+        children: [
+          Icon(
+            Icons.circle, size: 8,
+            color: (value.isEven)
+              ? const Color.fromARGB(255, 42, 125, 235)
+              : const Color.fromARGB(255, 42, 235, 90)
+          ),
+          const SizedBox(width: 5),
+          _texto(label),
+          const Spacer(),
+          _texto('$value', color: const Color.fromARGB(255, 148, 148, 148)),
         ],
       ),
     );
@@ -127,8 +157,7 @@ class _DataConectionState extends State<DataConection> {
 
     final file = await GetPaths.getFileScreen();
     if (!await launchUrl(Uri.file(file.path))) {
-      // print('No se pudo lanzar ${file.path}');
-      throw 'Could not launch ${file.path}';
+      throw 'No se pudo lanzar ${file.path}';
     }
   }
 

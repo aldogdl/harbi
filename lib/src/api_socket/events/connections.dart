@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:get_server/get_server.dart';
-import 'package:harbi/src/entity/conectado.dart';
 
+import '../../entity/conectado.dart';
 import '../../config/globals.dart';
 import '../../config/sng_manager.dart';
 import '../../entity/response_event.dart';
@@ -28,9 +28,6 @@ class Connections {
         break;
       case 'ping':
         _ping('ping');
-        break;
-      case 'reping':
-        _ping('reping');
         break;
       default:
     }

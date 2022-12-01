@@ -67,9 +67,7 @@ class _ConectSocketState extends State<ConectSocket> {
     sock.setSockmsg(''.padRight(tprod.lenTxt, '-'));
     sock.setSockmsg('Conectando el SOCKET >_');
     sock.setSockmsg(''.padRight(tprod.lenTxt, '-'));
+    await sock.makeFirstConnection();
     await Future.delayed(const Duration(milliseconds: 2000));
-
-    await Future.delayed(const Duration(milliseconds: 250));
-    sock.makeFirstConnection();
   }
 }

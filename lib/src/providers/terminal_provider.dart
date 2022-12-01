@@ -1,9 +1,8 @@
-import 'package:cron/cron.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
+import 'package:cron/cron.dart';
 
 import '../config/globals.dart';
 import '../config/sng_manager.dart';
-import '../librerias/f_cron_centinela/conectados_check.dart';
 import '../librerias/f_cron_centinela/changes_misselanius.dart';
 import '../services/task_from_server.dart';
 
@@ -13,16 +12,9 @@ class TerminalProvider extends ChangeNotifier {
 
   Cron _recovery = Cron();
 
-  String currentVersion = '0';
-  
+  // La longitud de los caracteres para la terminal
   int lenTxt = 38;
-  // Usada para refrescar la seccion de conectados
-  bool refreshConectados = true;
-  void setRefreshConectados(bool refresh) {
-    refreshConectados = refresh;
-    notifyListeners();
-  }
-
+  
   int cantChecks = 0;
   DateTime lastCheck = DateTime.now();
 
@@ -33,7 +25,7 @@ class TerminalProvider extends ChangeNotifier {
   }
 
   ///
-  String _secc = 'initShell';
+  String _secc = 'fileSysInit';
   String get secc => _secc;
   set secc(String seccion) {
     _secc = seccion;
@@ -57,7 +49,9 @@ class TerminalProvider extends ChangeNotifier {
     }
     accs = List<String>.from(tmp);
     tmp = [];
-    notifyListeners();
+    try {
+      notifyListeners();
+    } catch (_) {}
   }
 
   /// El total de width
@@ -148,7 +142,7 @@ class TerminalProvider extends ChangeNotifier {
         lastCheck  = ti;
         cantChecks = cantChecks +1;
         setAccs('> [ Día: ${ti.day} | Hora: ${ pad('${ti.hour}') }:${ pad('${ti.minute}') }:${ pad('${ti.second}') } ] #$cantChecks');
-
+        
         final has = await TaskFromServer.checkCambionEnCentinela(uriCheckCron);
         if(has.containsKey('err')) {
 
@@ -157,33 +151,31 @@ class TerminalProvider extends ChangeNotifier {
             err = '[X] ${has['err']}';
           }
           setAccs(err);
-
-        }else{
-          
-          hasMisselanius = (has.containsKey('misselanius') && has['misselanius'])
-            ? true : false;
-          
-          if(has['centinela']) {
-            setAccs('[!] Detectada nueva versión...');
-            secc = 'downCent';
-          }else{
-            if(hasMisselanius) {
-              hasMisselanius = false;
-              await ChangesMisselanius.check(this);
-            }
-          }
+          return;
         }
 
-        final res = await TaskFromServer.sendNotificationUpdateTime();
-        if(res.containsKey('body')) {
-          if(res['body'].toString().startsWith('[√]')) {
-            ConectadosCheck.checarMiembrosConectados(this);
+        hasMisselanius = (has.containsKey('misselanius') && has['misselanius'])
+          ? true : false;
+        
+        if(has['centinela']) {
+          // Hay cambios en el centinela, procesamos los miselanius despues
+          // de descargar el nuevo archivo.
+          setAccs('[!] Detectada nueva versión...');
+          secc = 'downCent';
+        }else{
+          // No hay cambios en el centinela, pero si en otros elementos
+          // see, resps, noTengo, campañas etc...
+          if(hasMisselanius) {
+            hasMisselanius = false;
+            setIsPausado(true);
+            await ChangesMisselanius.check(this);
+            setIsPausado(false);
           }
         }
       }
 
     }else{
-      _globals.versionCentinela = '1';
+      _globals.versionCentinela = await TaskFromServer.getVersionCentinelaCurrent();
     }
   }
 

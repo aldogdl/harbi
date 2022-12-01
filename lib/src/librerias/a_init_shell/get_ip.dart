@@ -1,10 +1,14 @@
 import 'dart:io';
-
 import 'package:network_info_plus/network_info_plus.dart';
+
+import '../../config/globals.dart';
+import '../../config/sng_manager.dart';
+import '../../services/get_paths.dart';
 
 class GetIp {
 
   static final info = NetworkInfo();
+  static Globals globals = getSngOf<Globals>();
 
   ///
   static Future<Map<String, dynamic>> search() async {
@@ -12,13 +16,17 @@ class GetIp {
     Map<String, dynamic> interfaces = {};
     /// Recuperamos todas las interfaces existentes
     try {
-      
       interfaces['wifiName'] = await info.getWifiName() ?? 'Oculta';
     } catch (_) {
       interfaces['wifiName'] = 'AutoparNet';
     }
 
-    interfaces['interfaces'] = await _getAllInterfaces();
+    final res = await _getAllInterfaces();
+    if(res.first.containsKey('created')) {
+      interfaces['recovery'] = res.first;
+    }else{
+      interfaces['interfaces'] = res;
+    }
     return interfaces;
   }
 
@@ -26,6 +34,22 @@ class GetIp {
   /// conectan a internet, seleccionandola esta se guarda como la ip principal
   /// en la variable globals.
   static Future<List<Map<String, dynamic>>> _getAllInterfaces() async {
+
+    // Revisamos si las conecciones actuales estan vigentes.
+    final current = await GetPaths.getContentFileOf('harbi_connx');
+    if(current.isNotEmpty) {
+      if(current.containsKey('body')) {
+      
+        if(current['body'].containsKey('created')) {
+          final hoy = DateTime.now();
+          final make = DateTime.parse(current['body']['created']);
+          final diff = make.difference(hoy);
+          if(diff.inHours < globals.timeScanIps) {
+            return [current['body']];
+          }
+        }
+      }
+    }
 
     final conns = await NetworkInterface.list(
       includeLinkLocal: true,

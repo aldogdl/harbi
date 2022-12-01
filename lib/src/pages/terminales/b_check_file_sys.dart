@@ -5,10 +5,10 @@ import '../../librerias/b_check_file_sys/files_ex.dart';
 import '../../librerias/b_check_file_sys/make_rutas.dart';
 import '../../librerias/b_check_file_sys/my_paths.dart';
 import '../../librerias/b_check_file_sys/binarios_harbi_zip.dart';
+import '../../providers/terminal_provider.dart';
+import '../../services/task_from_server.dart';
 import '../../widgets/terminal_skel.dart';
 import '../../widgets/txt_terminal.dart';
-import '../../services/task_from_server.dart';
-import '../../providers/terminal_provider.dart';
 
 class CheckFileSys extends StatefulWidget {
 

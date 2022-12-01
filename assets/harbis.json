@@ -1,0 +1,12 @@
+{
+    "001H":{
+        "estacion": "Iksan Autopartes",
+        "domicilio": "",
+        "gerente"  : "Mireya López"
+    },
+    "002H":{
+        "estacion": "Autoparnet",
+        "domicilio": "Nicólas Bravo",
+        "gerente"  : "Aldo Cervantes"
+    }
+}

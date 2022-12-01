@@ -10,8 +10,19 @@ class FilesEx {
 
     List<String> sep = [GetPaths.getSep()];
 
+    //<---- ESTACIONES DE TRABAJOS ---->
+    var content = await GetPaths.getContentAssetsBy('harbis.json');
+    if (content.isNotEmpty) {
+      String path = await GetPaths.getFileByPath('harbis');
+      if(path.isNotEmpty) {
+        File(path).writeAsStringSync(
+          json.encode(json.decode(content))
+        );
+      }
+    }
+    
     //<---- CARGOS ---->
-    var content = await GetPaths.getContentAssetsBy('cargos.json');
+    content = await GetPaths.getContentAssetsBy('cargos.json');
     if (content.isNotEmpty) {
       String path = await GetPaths.getFileByPath('cargos');
       File(path).writeAsStringSync(

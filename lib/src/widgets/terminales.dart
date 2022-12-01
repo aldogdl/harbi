@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:harbi/src/pages/terminales/a1_file_sys_init.dart';
 import 'package:provider/provider.dart';
 
 import '../pages/terminales/b_check_file_sys.dart';
@@ -29,6 +30,8 @@ class Terminales extends StatelessWidget {
     switch (secc) {
       case 'refresh':
         return const RefreshSystema();
+      case 'fileSysInit':
+        return const FileSysInit();
       case 'initShell':
         return const InitShell();
       case 'checkFileSys':
@@ -45,4 +48,5 @@ class Terminales extends StatelessWidget {
         return const SizedBox();
     }
   }
+
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:harbi/src/services/pushin_build.dart';
 import 'package:provider/provider.dart';
 
 import '../../widgets/terminal_skel.dart';
@@ -62,13 +63,19 @@ class _DownCentinelaState extends State<DownCentinela> {
     }else{
       
       tprod.setAccs('[√] DESCARGA EXITOSA.');
-      await Future.delayed(const Duration(milliseconds: 250));
+      // Enviar una notificacion a todos de actualizar centinela.
+      // al actualizar cada SCP el centinela, solo debe revisar si hay nuevas
+      // asignaciones.
+      await _pushUpdateMake();
+      tprod.setAccs('[√] Enviando Centinela UPDATE.');
+      await Future.delayed(const Duration(milliseconds: 3000));
 
       if(tprod.hasMisselanius) {
         tprod.hasMisselanius = false;
         await ChangesMisselanius.check(tprod);
       }
       
+      // Checamos si hay nuevas ordenes para descargar.
       await ChangesCentinela.chek('centinela', HarbiFTP.oldCenti, tprod);
       ChangesCentinela.dispose();
       HarbiFTP.oldCenti = {};
@@ -77,5 +84,21 @@ class _DownCentinelaState extends State<DownCentinela> {
     tprod.secc = 'cron';
   }
 
+  ///
+  Future<void> _pushUpdateMake() async {
+
+    final schema = PushInBuild.getSchemaMain(
+      priority: 'baja',
+      secc: 'centinela',
+      titulo: 'Nueva Versión del CENTINELA FILE',
+      descrip: 'Cambio de: ${HarbiFTP.oldCenti['version']} a: ${HarbiFTP.globals.versionCentinela}',
+      data: {
+        'oldv': HarbiFTP.oldCenti['version'],
+        'newv': HarbiFTP.globals.versionCentinela
+      }
+    );
+    PushInBuild.setIn('centinela_update', schema);
+    await Future.delayed(const Duration(milliseconds: 350));
+  }
 
 }

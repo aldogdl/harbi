@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:harbi/src/providers/socket_conn.dart';
 import 'package:provider/provider.dart';
 
 import '../config/globals.dart';
@@ -19,7 +20,7 @@ class Conectados extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8),
       color: MyTheme.bgSec,
-      child: Selector<TerminalProvider, bool>(
+      child: Selector<SocketConn, bool>(
         selector: (_, prov) => prov.refreshConectados,
         builder: (_, val, child) {
 

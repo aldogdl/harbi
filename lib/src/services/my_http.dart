@@ -78,7 +78,6 @@ class MyHttp {
   static Future<void> get(String uri) async {
 
     Uri url = Uri.parse(uri);
-
     http.Response response = await http.get(url);
     if (response.statusCode == 200) {
       result = Map<String, dynamic>.from(json.decode(response.body));
@@ -117,7 +116,7 @@ class MyHttp {
   ///
   static Future<String> makeLogin(data) async {
 
-    bool isLocal = (globals.workOnlyLocal) ? true : false;
+    bool isLocal = (globals.env == 'dev') ? true : false;
 
     String dom = await GetPaths.getDominio(isLocal: isLocal);
     String base = 'secure-api-check';

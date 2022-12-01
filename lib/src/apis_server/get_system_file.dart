@@ -83,6 +83,9 @@ class GetSysemFile extends GetView {
       case 'getIpDb':
         getData = _getIpDb();
         break;
+      case 'getSwh':
+        getData = _getSwh();
+        break;
       default:
         getData = _unknowFnc();
     }
@@ -162,7 +165,7 @@ class GetSysemFile extends GetView {
 
   ///
   Future<void> _getCentinela() async {
-
+    
     final content = await GetPaths.getContentFileOf('centinela');
     _setResult(content.isEmpty, 'No hay datos en el Centinela.');
     if(content.isNotEmpty) {
@@ -185,6 +188,12 @@ class GetSysemFile extends GetView {
       'port_s': mapa['portServer'],
       'type_c': _globals.typeConn,
     };
+  }
+
+  ///
+  Future<void> _getSwh() async {
+    final res = await GetPaths.getContentFileOf('swh', isTxt: true);
+    result['body'] = res['body'];
   }
 
   ///

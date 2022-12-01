@@ -47,7 +47,7 @@ class Harbi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    const borderColor = Color(0xFF805306);
+    const borderColor = Color.fromARGB(255, 0, 0, 0);
 
     return MaterialApp(
       title: 'HARBI',
@@ -55,7 +55,7 @@ class Harbi extends StatelessWidget {
       home: Scaffold(
         body: WindowBorder(
           color: borderColor,
-          width: 1,
+          width: 0,
           child: MultiProvider(
             providers: [
               ChangeNotifierProvider(create: (context) => TerminalProvider()),

@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:harbi/src/config/globals.dart';
+
 import '../run_exe.dart';
 import '../../providers/terminal_provider.dart';
 import '../../services/get_paths.dart';
@@ -36,7 +38,7 @@ class ChangesCentinela {
     }
     
     final has = await _hasOrdenesNew(prov);
-    if(has){ _goForDowordSave(prov); }
+    if(has){ _goForDowOrdSave(prov); }
   }
 
   /// Nuevas ordenes
@@ -63,9 +65,15 @@ class ChangesCentinela {
   }
 
   ///
-  static Future<void> _goForDowordSave(TerminalProvider prov) async {
+  static Future<void> _goForDowOrdSave(TerminalProvider prov) async {
 
-    prov.setAccs('> Iniciando proceso [DOWORDSAVE]');
+    final globals = Globals();
+    String tit = '> Iniciando proceso [DOWORDSAVE]';
+    if(globals.env == 'dev'){
+      toDown.insert(0, 'dev');
+      tit = '> Iniciando proceso como DEV [DOWORDSAVE]';
+    }
+    prov.setAccs(tit);
     RunExe.start('dowordsave', args: toDown);
   }
 }

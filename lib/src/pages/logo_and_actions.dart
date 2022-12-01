@@ -80,24 +80,28 @@ class LogoAndActions extends StatelessWidget {
   ///
   Widget _title() {
 
+    String dev = (_globals.env == 'dev') ? 'dev' : '';
+
     return Padding(
       padding: const EdgeInsets.only(left: 8, top: 10),
       child: Tooltip(
         message: 'Herramienta AUTOPARNET, Revisión Bidireccional Inteligente',
         child: Text.rich(
           TextSpan(
-            text: 'HARBI ',
+            text: 'HARBI $dev ',
             style: GoogleFonts.comfortaa(
-              fontSize: 13,
+              fontSize: 11,
               height: 1,
-              color: const Color.fromARGB(255, 168, 173, 175),
+              color: (dev.isEmpty)
+                ? const Color.fromARGB(255, 168, 173, 175)
+                : const Color.fromARGB(255, 255, 223, 82),
               fontWeight: FontWeight.bold
             ),
             children: [
               TextSpan(
                 text: ' ${_globals.harbiV}',
                 style: const TextStyle(
-                  fontSize: 11,
+                  fontSize: 10,
                   color: Colors.amber
                 )
               )

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../config/my_theme.dart';
 import '../../config/sng_manager.dart';
 import '../../config/globals.dart';
+import '../../providers/socket_conn.dart';
 import '../../providers/terminal_provider.dart';
 import '../../services/get_paths.dart';
 import '../../widgets/terminal_skel.dart';
@@ -77,7 +78,7 @@ class _CronCentinelaState extends State<CronCentinela> {
         selector: (_, prov) => prov.progressCount,
         builder: (_, seg, __) {
           return Text(
-            'vc: ${context.read<TerminalProvider>().currentVersion}       $seg/${_globals.revCada}s',
+            'vc: ${_globals.versionCentinela}       $seg/${_globals.revCada}s',
             textScaleFactor: 1,
             style: const TextStyle(
               fontSize: 12, color: Colors.white
@@ -127,12 +128,18 @@ class _CronCentinelaState extends State<CronCentinela> {
   ///
   Future<void> _initWidget() async {
 
+    bool isLoc = (_globals.env == 'dev') ? true : false;
     if(_tprov.uriCheckCron.isEmpty) {
-      _tprov.uriCheckCron = await GetPaths.getUri('check_changes', isLocal: false);
+      _tprov.uriCheckCron = await GetPaths.getUri('check_changes', isLocal: isLoc);
     }
 
     if(mounted) {
-      Future.delayed(const Duration(milliseconds: 500), (){
+
+      final sock = context.read<SocketConn>();
+      await sock.initCheckInPush();
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      Future.delayed(const Duration(milliseconds: 500), () {
         _tprov.setIsPausado(false);
         _tprov.cronStart();
       });

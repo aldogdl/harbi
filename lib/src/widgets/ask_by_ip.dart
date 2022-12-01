@@ -208,8 +208,7 @@ class _AskByIpState extends State<AskByIp> {
     if (ip == 'local') {
       _accions.value = 'HARBI, trabajarará sólo de manera LOCAL';
       widget.tprov.setAccs('[√] Trabajando de manera local');
-      _globals.workOnlyLocal = true;
-      _globals.bdRemota= 'https://_dom_.com/';
+      _globals.env = 'dev';
       await Future.delayed(const Duration(milliseconds: 3000));
       return true;
     }
@@ -221,7 +220,6 @@ class _AskByIpState extends State<AskByIp> {
       if(res == 'ok') { return _accOk(); }
     }
 
-    _globals.bdRemota = 'https://_dom_.com/';
     return false;
   }
 

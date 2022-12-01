@@ -1,4 +1,4 @@
-ver,2
+ver,3
 1,Registrando Orden
 2,Orden en Procesamiento
 3,Buscando Piezas

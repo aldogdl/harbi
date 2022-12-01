@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:harbi/src/providers/socket_conn.dart';
 import 'package:provider/provider.dart';
 
 import '../../widgets/terminal_skel.dart';
@@ -47,11 +48,13 @@ class _RefreshSystemaState extends State<RefreshSystema> {
   Future<void> _initWidget(_) async {
 
     final tprod = context.read<TerminalProvider>();
+    final sockt = context.read<SocketConn>();
     tprod.accs = [];
     tprod.setAccs('Refrescando Sistema >_');
+    await sockt.cancelCronInPush();
     await Future.delayed(const Duration(milliseconds: 1000));
 
-    tprod.secc = 'initShell';
+    tprod.secc = 'fileSysInit';
   }
 
 }

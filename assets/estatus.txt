@@ -3,6 +3,7 @@
 2,Orden en Fila
 2,Orden en Revisión
 3,En Rastreo
+3,Liberada
 4,En Evaluación
 4,En Mostrador
 5,En Recolección y Proceso

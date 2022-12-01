@@ -46,20 +46,28 @@ class CentinelaScpApi  extends GetView  {
       }
     }
     clean();
-
-    if(query.isNotEmpty) {
-      _speelQuery(query);
-    }
+    
+    if(query.isNotEmpty) { _speelQuery(query); }
     if(fnc['fnc'].isNotEmpty) {
 
       switch (fnc['fnc']) {
-        case 'get_metrix_of_file': return await _getMetrixOfFile();
+        case 'get_metrix_of_file' : return await _getMetrixOfFile(); // Borrar
+        case 'get_metrix_by_orden': return await _getMetrixByIdOrdenAndIdCamp();
+        case 'get_iris_by_orden'  : return await _getIrisByIdOrden();
         default:
           return _unknowFnc();
       }
     }
     
     return _unknowFnc();
+  }
+
+  ///
+  void _speelQuery(String query) {
+
+    final partes = query.split('=');
+    fnc['fnc'] = partes.first.toLowerCase().trim();
+    fnc['query'] = partes.last.toLowerCase().trim();
   }
 
   ///
@@ -74,14 +82,6 @@ class CentinelaScpApi  extends GetView  {
         return const WidgetEmpty();
       },
     );
-  }
-
-  ///
-  void _speelQuery(String query) {
-
-    final partes = query.split('=');
-    fnc['fnc'] = partes.first.toLowerCase().trim();
-    fnc['query'] = partes.last.toLowerCase().trim();
   }
 
   ///
@@ -288,6 +288,77 @@ class CentinelaScpApi  extends GetView  {
     }
 
     return contents;
+  }
+
+  ///
+  Future<Map<String, dynamic>> _getMetrixByIdOrdenAndIdCamp() async {
+
+    // Ej Query = get_metrix_by_orden=idOrden:idCamp;
+
+    final s = GetPaths.getSep();
+    final String q = fnc['query'];
+    final partes = q.split(':');
+    String idOrden = partes.first;
+    String idCamp  = partes.last;
+
+    // Saber el path del expediente de la orden.
+    final pathEx = getFolderExpedienteByIdOrden(idOrden);
+    if(pathEx.isNotEmpty) {
+      final fCamp = Directory('$pathEx$idCamp');
+      if(fCamp.existsSync()) {
+        final fMetrix = File('${fCamp.path}$s${"metrix.json"}');
+        if(fMetrix.existsSync()) {
+          _setResult(false, '');
+          result['body'] = fMetrix.readAsStringSync();
+          return result;
+        }
+      }
+    }
+    return {};
+  }
+
+  ///
+  Future<Map<String, dynamic>> _getIrisByIdOrden() async {
+
+    // Ej Query = get_iris_by_orden=idOrden;
+
+    final s = GetPaths.getSep();
+    String idOrden = fnc['query'];
+
+    // Saber el path del expediente de la orden.
+    final pathEx = getFolderExpedienteByIdOrden(idOrden);
+    
+    _setResult(false, '');
+    result['body'] = {};
+    if(pathEx.isNotEmpty) {
+      final fCamp = Directory(pathEx);
+      if(fCamp.existsSync()) {
+        final fIris = File('${fCamp.path}$s$idOrden${"_iris.json"}');
+        if(fIris.existsSync()) {
+          result['body'] = fIris.readAsStringSync();
+        }
+      }
+    }
+    return result;
+  }
+
+  ///
+  String getFolderExpedienteByIdOrden(String idOrden) {
+
+    final s = GetPaths.getSep();
+    final ords = GetPaths.getPathsFolderTo('ords');
+    if(ords != null) {
+      final fIndex = File('${ords.path}$s${"index_ords.json"}');
+      if(fIndex.existsSync()) {
+        final indexC = Map<String, dynamic>.from(json.decode(fIndex.readAsStringSync()));
+        if(indexC.isNotEmpty) {
+          if(indexC.containsKey(idOrden)) {
+            return '${ords.path}$s${indexC[idOrden]}$s$idOrden$s';
+          }
+        }
+      }
+    }
+    return '';
   }
 
   ///

@@ -226,17 +226,25 @@ class GetPaths {
   ///
   static Future<String> getFileByPath(String path) async {
     final paths = await _getFromFilePathsProd(path);
-    return paths['uri'];
+    if(paths.isNotEmpty) {
+      return paths['uri'];
+    }
+    return '';
   }
 
   ///
   static Future<String> getDominio({bool isLocal = true}) async {
+
+    isLocal = (env == 'dev') ? true : isLocal;
+    
     final paths = await _getFromFilePathsProd('portServer');
     return (isLocal) ? paths['base_l'] : paths['base_r'];
   }
 
   ///
   static Future<Map<String, dynamic>> getConnectionFtp({bool isLocal = true}) async {
+
+    isLocal = (env == 'dev') ? true : isLocal;
 
     final pathDt = await _getFromFilePathsProd('ftp');
     String sufix = (isLocal) ? 'l' : 'r';
@@ -246,6 +254,31 @@ class GetPaths {
       'p': pathDt['uri']['p'],
       'ssl': true
     };
+  }
+
+  ///
+  static Future<void> setDataConectionLocal() async {
+    
+    String path = await getFileByPath('harbi_connx');
+    File file = File(path);
+    var toWrite = await getBaseLocalAndRemoto();
+    if(toWrite.containsKey('local')) {
+      if(toWrite['local'] != globals.bdLocal) {
+        toWrite['local'] = globals.bdLocal;
+      }
+    }
+    if(toWrite.containsKey('remoto')) {
+      if(toWrite['remoto'] != globals.bdRemota) {
+        toWrite['remoto'] = globals.bdRemota;
+      }
+    }
+
+    if(toWrite.containsKey('pto-loc')) {
+      if(toWrite['pto-loc'] != globals.portdb) {
+        toWrite['pto-loc'] = globals.portdb;
+      }
+    }
+    file.writeAsStringSync(json.encode(toWrite));
   }
 
   ///
@@ -260,14 +293,16 @@ class GetPaths {
       'ptoHarbi': globals.portHarbi,
       'typeConx': globals.typeConn,
       'pto-loc': paths['uri'],
+      'created': DateTime.now().toIso8601String()
     };
   }
 
   ///
   static Future<String> getUri(String uri, {bool isLocal = true}) async {
 
-    Map<String, dynamic> uriPath = await _getFromFilePathsProd(uri);
+    isLocal = (env == 'dev') ? true : isLocal;
 
+    Map<String, dynamic> uriPath = await _getFromFilePathsProd(uri);
     String base = '${uriPath['base_l']}${uriPath['uri']}/';
     if (!isLocal) {
       base = '${uriPath['base_r']}${uriPath['uri']}/';
@@ -292,14 +327,14 @@ class GetPaths {
   }
 
   ///
-  static Future<Map<String, dynamic>> getContentFileOf(String path) async {
+  static Future<Map<String, dynamic>> getContentFileOf(String path, {bool isTxt = false}) async {
 
     final paths = await _getFromFilePathsProd(path);
     
     final file = File(paths['uri']);
     if(file.existsSync()) {
       try {
-        final content = json.decode(file.readAsStringSync());
+        final content = (isTxt) ? file.readAsStringSync() : json.decode(file.readAsStringSync());
         return {'body': content};
       } catch (e) {
         // PrintScreen.alert(msg: e.toString());

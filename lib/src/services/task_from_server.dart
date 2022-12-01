@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:harbi/src/services/pushin_build.dart';
+
 import 'get_paths.dart';
 import 'my_http.dart';
 import '../config/sng_manager.dart';
@@ -17,7 +19,7 @@ class TaskFromServer {
 
     consol.setAccs('Organizando AUTOS');
     await downLoadDataAutos();
-    consol.setAccs('Organizando REMITENTES');
+    consol.setAccs('Organizando COTIZADORES');
     await getCotizadores(consol);
     consol.setAccs('Información Incial lista');
   }
@@ -41,7 +43,7 @@ class TaskFromServer {
   ///
   static Future<void> getCotizadores(TerminalProvider consol) async {
     
-    consol.setAccs('Buscando Remitentes en SR');
+    consol.setAccs('Buscando Cotizadores en SR');
     final uri = await GetPaths.getUri('get_all_cotz');
     await MyHttp.get(uri);
     
@@ -141,8 +143,8 @@ class TaskFromServer {
       if(hacia == 'local') {
         isLocal = true;
       }
-      if(!_globals.workOnlyLocal) {
-        isLocal = true;
+      if(hacia != 'local' && _globals.env == 'dev') {
+        return;
       }
       String uri = await GetPaths.getUri('save_ruta_last', isLocal: isLocal);
       await MyHttp.post(uri, ruta);
@@ -150,33 +152,66 @@ class TaskFromServer {
   }
 
   /// Subimos al servidor todos los datos de conexion de éste harbi
-  static Future<void> upDataConnection() async {
+  static Future<String> upDataConnection() async {
 
-    final data = base64Encode( utf8.encode('${_globals.ipHarbi}:${_globals.portHarbi}') );
-    
-    bool isLocal = (_globals.workOnlyLocal) ? true : false;
+    bool isLocal = (_globals.env == 'dev') ? true : false;
     String uri = await GetPaths.getUri('save_ip_address_harbi', isLocal: isLocal);
 
     if(uri.isNotEmpty) {
 
-      await MyHttp.post(uri, {'key':_globals.passH, 'conx':data});
+      final res = await GetPaths.getContentFileOf('swh', isTxt: true);
+      if(!res['body'].toString().endsWith('H')){
+        return 'swh';
+      }
+      _globals.swh = res['body'].toString().trim();
+
+      final data = base64Encode( utf8.encode('${_globals.ipHarbi}:${_globals.portHarbi}') );
+      await MyHttp.post(uri, {'key':_globals.swh, 'conx':data});
+
       if(!MyHttp.result['abort']) {
-        String path = await GetPaths.getFileByPath('harbi_connx');
-        File file = File(path);
-        var toWrite = await GetPaths.getBaseLocalAndRemoto();
-        file.writeAsStringSync(json.encode(toWrite));
+        Map<String, dynamic> conn = await GetPaths.getContentFileOf('harbiconnxl');
+        if(!conn.containsKey(_globals.swh)) {
+          conn.putIfAbsent(_globals.swh, () => data);
+        }else{
+          conn[_globals.swh] = data;
+        }
+        final path = await GetPaths.getFileByPath('harbiconnxl');
+        final file = File(path);
+        file.writeAsStringSync(json.encode(conn));
       }
     }
+    return 'ok';
+  }
+
+  
+  ///
+  static Future<String> getVersionCentinelaCurrent() async {
+
+    final uriPath = await GetPaths.getFileByPath('centinela');
+    File centi = File(uriPath);
+    if (centi.existsSync()) {
+      Map<String, dynamic>? content = json.decode(centi.readAsStringSync());
+      if (content != null) {
+        if(content.containsKey('version')) {
+          _globals.versionCentinela = '${content['version']}';
+          return '${content['version']}';
+        }
+      }
+      content = null;
+    }
+    return '1';
   }
 
   ///
   static Future<Map<String, dynamic>> checkCambionEnCentinela(String uri) async {
 
     await MyHttp.get('$uri${_globals.versionCentinela}');
+    
     if(!MyHttp.result['abort']) {
 
       bool save = false;
       var r = Map<String, dynamic>.from(MyHttp.result['body']);
+
       MyHttp.cleanResult();
       
       if(r.containsKey('camping')) {
@@ -184,27 +219,37 @@ class TaskFromServer {
       }
 
       if(!save) {
-        if(r.containsKey('scmSee')) {
-          save = r['scmSee'];
+        if(r.containsKey('iris')) {
+          save = r['iris'];
         }
       }
 
       if(!save) {
-        if(r.containsKey('scmResp')) {
-          save = r['scmResp'];
+        if(r.containsKey('ntg')) {
+          save = r['ntg'];
         }
       }
 
       if(!save) {
-        if(r.containsKey('filNtg')) {
-          if(r['filNtg']) {
-            save = true;
+        if(r.containsKey('resp')) {
+          save = r['resp'];
+        }
+      }
+
+      if(!save) {
+        final logs = GetPaths.getPathsFolderTo('logs');
+        if(logs != null) {
+          final lst = logs.listSync().toList();
+          if(lst.isNotEmpty) {
+            for (var i = 0; i < lst.length; i++) {
+              if(lst[i].path.contains('fire_push')) {
+                r['firepush'] = true;
+                save = true;
+                break;
+              }
+            }
           }
         }
-      }
-
-      if(r.containsKey('asigns')) {
-        await sendNotificationUpdateData();
       }
 
       if(save) {
@@ -219,24 +264,22 @@ class TaskFromServer {
   }
 
   ///
-  static Future<Map<String, dynamic>> sendNotificationUpdateData() async {
+  static Future<Map<String, dynamic>> buildNotification(String tipo) async {
 
-    String query = 'event%self-fnc%notifAll_UpdateData-data%'
-    'acc=recovery';
-
-    String url = await GetPaths.getApi('push');
-    Uri uri = Uri.http('${_globals.ipHarbi}:${_globals.portHarbi}', '$url/$query');
-    await MyHttp.getApi(uri);
-    return MyHttp.result;
+    PushInBuild.getSchemaMain(
+      priority: 'baja',
+      secc: 'centinela',
+      titulo: 'NUEVA VERSIÓN DEL CENTINELA FILE',
+      descrip: '',
+      data: {}
+    );
+    return {};
   }
 
   ///
-  static Future<Map<String, dynamic>> sendNotificationUpdateTime() async {
+  static Future<Map<String, dynamic>> sendPushRevision(int rev) async {
 
-    final time = DateTime.now();
-    String query = 'event%self-fnc%notifAll_UpdateTime-data%'
-    'time=${time.minute}:${time.second},vers=${_globals.versionCentinela}';
-
+    String query = 'update-time%rev=$rev,vers=${_globals.versionCentinela}';
     String url = await GetPaths.getApi('push');
     Uri uri = Uri.http('${_globals.ipHarbi}:${_globals.portHarbi}', '$url/$query');
     await MyHttp.getApi(uri);

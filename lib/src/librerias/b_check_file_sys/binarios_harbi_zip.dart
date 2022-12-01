@@ -30,7 +30,7 @@ class BinariosHarbi {
           final filename = file.name;
           if(file.isFile) {
             final data = file.content as List<int>;
-            File('${dirBin.path}/$filename')
+            File('${dirBin.path}${GetPaths.getSep()}$filename')
               ..createSync(recursive: true)
               ..writeAsBytesSync(data);
 

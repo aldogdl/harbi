@@ -14,12 +14,12 @@ class MySocket {
   ///
   static void fnc(GetSocket ws) {
 
-    ws.onMessage((event) async => OnMessage(event: event, ws: ws));
-
     ws.onOpen((socket) async {
       socket.sockets.add(socket);
       socket.send(json.encode({'connId': socket.id}));
     });
+    
+    ws.onMessage((event) async => OnMessage(event: event, ws: ws));
 
     ws.onClose((socket) {
       int inx = _globals.conectados.indexWhere((e) => e.idCon == '${socket.socket.id}');

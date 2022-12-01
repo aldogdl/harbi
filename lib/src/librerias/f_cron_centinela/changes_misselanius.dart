@@ -1,8 +1,11 @@
 import 'dart:io';
 import 'dart:convert';
 
-import '../e_down_centinela/harbi_ftp.dart';
+import 'package:harbi/src/repository/fire_push_repository.dart';
+
 import '../run_exe.dart';
+import '../../config/globals.dart';
+import '../../config/sng_manager.dart';
 import '../../services/get_paths.dart';
 import '../../providers/terminal_provider.dart';
 
@@ -11,7 +14,9 @@ class ChangesMisselanius {
   static const nameFile = 'misselanius_';
 
   static List<Map<String, dynamic>> _changes = [];
+  static List<Map<String, dynamic>> _firesPush = [];
   static bool _campas = false;
+  static Globals globals = getSngOf<Globals>();
 
   ///
   static Future<void> save(Map<String, dynamic> data) async {
@@ -28,30 +33,38 @@ class ChangesMisselanius {
   ///
   static Future<void> check(TerminalProvider prov) async {
 
-    prov.setAccs('> Revisando MISSELANIUS:');
+    _firesPush = [];
     bool hasChanges = false;
+    final pathToLog = GetPaths.getPathsFolderTo('logs');
+
+    prov.setAccs('> Revisando MISSELANIUS:');
     await Future.delayed(const Duration(milliseconds: 250));
 
-    final pathToLog = GetPaths.getPathsFolderTo('logs');
     if(pathToLog != null) {
 
-      final lst = pathToLog.listSync();
+      final lst = pathToLog.listSync().toList();
       for (var i = 0; i < lst.length; i++) {
 
-        Uri uri = Uri.file(lst[i].path, windows: true);
-        final segs = uri.pathSegments;
-        if(segs.last.startsWith(nameFile)) {
+        if(lst[i].path.contains(nameFile)) {
           final file = File(lst[i].path);
           _changes.add(Map<String, dynamic>.from(json.decode(file.readAsStringSync())));
+          file.deleteSync();
+        }
+
+        if(lst[i].path.contains('fire_push')) {
+          final file = File(lst[i].path);
+          final content = _checkDuplex(file);
+          if(content.isNotEmpty) {
+            _firesPush.add(content);
+          }
           file.deleteSync();
         }
       }
     }
 
-    bool goForScmSee = false;
+    bool goForIris = false;
     bool goForScmResp = false;
-    bool goForFiltros = false;
-
+    
     if(_changes.isNotEmpty) {
 
       for (var i = 0; i < _changes.length; i++) {
@@ -60,25 +73,20 @@ class ChangesMisselanius {
           _campas = _changes[i]['camping'];
         }
 
-        if(_changes[i].containsKey('filNtg')) {
-          goForFiltros = _changes[i]['filNtg'];
-        }
-        
-        if(_changes[i].containsKey('scmSee')) {
-          goForScmSee = _changes[i]['scmSee'];
+        if(_changes[i].containsKey('ntg')) {
+          goForIris = _changes[i]['ntg'];
         }
 
+        if(!goForIris) {
+          if(_changes[i].containsKey('iris')) {
+            goForIris = _changes[i]['iris'];
+          }
+        }
+        // resp
         if(_changes[i].containsKey('scmResp')) {
           goForScmResp = _changes[i]['scmResp'];
         }
       } 
-    }
-
-    if(goForFiltros) {
-      hasChanges = true;
-      prov.setAccs('> HAY NUEVOS FILTROS...');
-      await Future.delayed(const Duration(milliseconds: 250));
-      await _goForFiltros(prov); 
     }
 
     if(_campas) {
@@ -88,11 +96,10 @@ class ChangesMisselanius {
       await _hasCampaniasNew(prov);
     }
     
-    if(goForScmSee) {
+    if(goForIris) {
       hasChanges = true;
-      prov.setAccs('> HAY VISTAS DE CAMPAÑAS...');
-      await Future.delayed(const Duration(milliseconds: 250));
-      await _goForScmSee(prov);
+      prov.setAccs('> REGISTROS DE ATENCIÓN...');
+      await _goForIris(prov);
     }
 
     if(goForScmResp) {
@@ -102,25 +109,59 @@ class ChangesMisselanius {
       await _goForScmResp(prov);
     }
 
+    if(_firesPush.isNotEmpty) {
+      hasChanges = true;
+      prov.setAccs('> ENVIANDO NOTIFICACIONES...');
+      await Future.delayed(const Duration(milliseconds: 250));
+      await _processFirePush(prov);
+    }
+
     _changes = [];
     if(!hasChanges) {
       prov.setAccs('> Sin cambios en MISSELANIUS.');
     }
-    await Future.delayed(const Duration(milliseconds: 1500));
+    await Future.delayed(const Duration(milliseconds: 500));
+  }
+
+  /// Revisamos que entre los archivos fire_push no existan campañas duplicadas
+  static Map<String, dynamic> _checkDuplex(File fire) {
+
+    final content = Map<String, dynamic>.from(json.decode(fire.readAsStringSync()));
+    final hasDuplex = _firesPush.where((p) => p['idCamp'] == content['idCamp']);
+    if(hasDuplex.isNotEmpty) {
+      if(hasDuplex.first['idAvo'] == content['idAvo']) {
+        if(hasDuplex.first['id'] == content['id']) {
+          return {};
+        }
+      }
+    }
+    return content;
   }
 
   /// Revisamos si hay nuevas descargas y vistas de cotizadores
-  static Future<void> _goForScmSee(TerminalProvider prov) async {
+  static Future<void> _goForIris(TerminalProvider prov) async {
 
-    prov.setAccs('> Iniciando proceso [REGSCMSEE]');
-    RunExe.start('regScmSee', args: []);
+    // Revisamos si ya esta abierto iris total.
+    final path = GetPaths.getPathRoot();
+    final f = File('$path${ GetPaths.getSep() }open_iris.log');
+    if(!f.existsSync()) {
+      prov.setAccs('> Iniciando proceso [IRISTOTAL]');
+      RunExe.start('iristotal', args: [globals.env]);
+    }else{
+      prov.setAccs('> Notificando a [IRISTOTAL]');
+      final filename = 'atencion-${DateTime.now().millisecondsSinceEpoch}.txt';
+      final fld = GetPaths.getPathsFolderTo('logs');
+      if(fld != null) {
+        File('${fld.path}${ GetPaths.getSep() }$filename').writeAsStringSync('');
+      }
+    }
   }
 
   /// Revisamos si hay nuevas respuestas de cotizadores a solicitudes
   static Future<void> _goForScmResp(TerminalProvider prov) async {
 
     prov.setAccs('> Iniciando proceso [REGSCMRESP]');
-    RunExe.start('regScmResp', args: []);
+    RunExe.start('regScmResp', args: [globals.env]);
   }
 
   /// Revisamos si hay nuevas campañas
@@ -128,24 +169,110 @@ class ChangesMisselanius {
 
     if(_campas) {
       prov.setAccs('> Iniciando proceso [NEWCAMPAS]');
-      RunExe.start('newcampas', args: []);
+      RunExe.start('newcampas', args: [globals.env]);
       _campas = false;
     }else{
       prov.setAccs('[!] Sin nuevas CAMPAÑAS');
     }
   }
 
-  ///
-  static Future<void> _goForFiltros(TerminalProvider tprod) async {
+  /// Procesamo los archivos de fire push, los cuales son archivos que 
+  /// los crea el SCM, indicando la finalizacion del envio de una campaña
+  static Future<void> _processFirePush(TerminalProvider prov) async {
 
-    tprod.setAccs('> Descargando nuevos [FILTROS]');
+    final fpEm = FirePushRepository();
+    prov.setAccs('[√] ---------- [ SCM ] ----------.');
+    prov.setAccs('> Liberando ORDENES para cotizadores');
+    await Future.delayed(const Duration(milliseconds: 150));
+    prov.setAccs('> Guardando Registros en Iris File');
+    prov.setAccs('> Guardando Registros en Métricas');
+    await Future.delayed(const Duration(milliseconds: 150));
+    prov.setAccs('> PROCESANDO FINALIZACIÓN DE CAMPAÑA');
+    prov.setAccs('[√] ---------- [ SCM ] ----------.');
+    await Future.delayed(const Duration(milliseconds: 150));
+
+    bool isLocal = (globals.env == 'dev') ? true : false;
+    List<String> liberar = [];
+    bool hasErr = false;
+
+    for (var i = 0; i < _firesPush.length; i++) {
+      
+      final idOrd = _firesPush[i]['data']['id'].toString().trim();
+      if(!liberar.contains(idOrd)) {
+        liberar.add(idOrd);
+      }
+
+      prov.setAccs('[!] ANALIZANDO ORDEN $idOrd.');
+      String expOrd = fpEm.getFolderExp(_firesPush[i]['data']['id']);
+      if(expOrd.isNotEmpty) {
+
+        // Tomamos las metricas del archivo de envio.
+        final metrixF = File('$expOrd${_firesPush[i]['data']['idCamp']}${fpEm.s}metrix.json');
+        final irisF = File('$expOrd$idOrd${"_iris.json"}');
+
+        if(metrixF.existsSync()) {
+          final metrix = Map<String, dynamic>.from(json.decode(metrixF.readAsStringSync()));
+          var idsCots = List<int>.from(metrix['sended']);
+          prov.setAccs('[>] REVISANDO ${idsCots.length} COTIZADORES.');
+
+          if(irisF.existsSync()) {
+            final iris = Map<String, dynamic>.from(json.decode(irisF.readAsStringSync()));
+            if(iris.isNotEmpty) {
+              // Analizamos para ver si algun cotizador ya atendio
+              iris.forEach((key, value) {
+                if(key != 'avo' && key != 'version') {
+                  final regs = Map<String, dynamic>.from(value);
+                  for (var c = 0; c < idsCots.length; c++) {
+                    if(regs.containsKey('${idsCots[c]}')) {
+                      idsCots.removeAt(c);
+                    }
+                  }
+                }
+              });
+            }
+          }
+
+          prov.setAccs('[>] CHECANDO FRECUENCIA DE ${idsCots.length} COTIZADORES.');
+          idsCots = await fpEm.checkFrecuencia(idsCots);
+
+          prov.setAccs('[>] ENVIANDO A ${idsCots.length} COTIZADORES.');
+          final res = await fpEm.sendPushTo(
+            _firesPush[i]['data']['id'], '${_firesPush[i]['data']['idCamp']}',
+            '${_firesPush[i]['data']['idAvo']}', idsCots, isLocal: isLocal
+          );
+
+          if(res.containsKey('abort')) {
+            if(res['abort']) {
+              prov.setAccs('[X] ERROR AL ENVIAR PUSH ORDEN $idOrd.');
+              hasErr = true;
+            }
+          }
+
+          if(!hasErr) {
+            if(idsCots.isNotEmpty) {
+              prov.setAccs('[>] ACTUALIZANDO FRECUENCIA A COTIZADORES.');
+              await fpEm.updateFrecuencia(idsCots, res);
+              prov.setAccs('[√] ORDEN $idOrd. ENVIADA');
+            }
+          }
+        }else{
+          prov.setAccs('[X] NO EXISTEN METRICAS ORDEN $idOrd.');
+          hasErr = true;
+        }
+      }else{
+        prov.setAccs('[X] EXPEDIENTE INEXISTENTE ORDEN $idOrd.');
+        hasErr = true;
+      }
+    }
+
+    if(hasErr) {
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
     
-    final resp = await HarbiFTP.downFileFiltros('filnotgo.json', 'notengo', tprod);
-    if(resp == 'err') {
-      tprod.setAccs('[X] Archivo Filtros no existe o error en Descarga');
-    }else{
-      tprod.setAccs('[√] DESCARGA [FILTROS] EXITOSA.');
-      await Future.delayed(const Duration(milliseconds: 250));
+    if(liberar.isNotEmpty) {
+      prov.setAccs('[>] LIBERANDO ORDENES.');
+      await fpEm.liberarOrden(liberar.join(','));
+      prov.setAccs('[√] ORDENES PUBLICADAS CON ÉXITO');
     }
   }
 

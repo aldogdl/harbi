@@ -1,5 +1,5 @@
 {
-    "ver": "21",
+    "ver": "35",
     "palcla": "0",
     "portadas":10,
     "portHarbi": 0,
@@ -16,6 +16,9 @@
     "folders_base": {
         "share": "data_share",
         "logs": "logs",
+        "pushin": "pushin",
+        "pushout": "pushout",
+        "pushlost": "pushlost",
         "harbi": "harbi",
         "udel": "udel",
         "ordenes": "ords",
@@ -25,14 +28,17 @@
         "scm_await": "scm_await",
         "scm_sended": "scm_sended",
         "scm_drash": "scm_drash",
-        "scm_msgs": "scm_msgs",
-        "data_ctcs": "data_ctcs"
+        "scm_msgs": "scm_msgs"
     },
     "files": {
         "testings": "folders_base::testings_scm.json",
+        "swh": "folders_base::swh.txt",
+        "harbiconnxl": "folders_base::harbi_connx.json",
         "notengo": "folders_base::share::filnotgo.json",
+        "opcotizo": "folders_base::share::opcotizo.json",
         "harbi_connx": "folders_base::share::harbi_connx.json",
         "cotizadores": "folders_base::share::cotz.json",
+        "firepush": "folders_base::share::fire_push.json",
         "centinela": "folders_base::share::centinela.json",
         "scmHtml": "folders_base::share::scmHtml.json",
         "connpass": "folders_base::share::connpass.json",
@@ -42,6 +48,7 @@
         "piezas": "folders_base::share::piezas.json",
         "roles": "folders_base::share::roles.json",
         "rutas": "folders_base::share::rutas.json",
+        "harbis": "folders_base::share::harbis.json",
         "logs": "folders_base::logs::logs.txt"
     },
     "prefix_uris": {
@@ -55,6 +62,7 @@
         "centinela_file" : "centinela/file/"
     },
     "api_harbi": [
+        "get_swh",
         "get_ipdb",
         "get_path_prod_ver",
         "get_path_prod",
@@ -81,12 +89,14 @@
         "publics_harbi::build-centinela-schema",
         "publics_harbi::download-centinela",
         "publics_harbi::download-filtros",
+        "publics_harbi::download-opcotizo",
         "publics_harbi::get-campaings",
         "publics_harbi::get-all-ordspzas",
         "publics_harbi::set-orden",
         "publics_harbi::set-pieza",
         "publics_harbi::set-resp",
         "publics_harbi::get-all-cotz",
+        "publics_harbi::get-camp-for-build",
         "publics_harbi::get-filesreg-of",
         "publics_harbi::get-all-campings",
         "publics_harbi::get-resp-by-ids",
@@ -96,6 +106,9 @@
         "publics_harbi::set-new-campaing",
         "publics_harbi::set-ests-stts",
         "publics_harbi::get-regs-receivers-by-id-camp",
+        "publics_harbi::push-finish-camp",
+        "publics_harbi::liberar-ordenes",
+        "publics_harbi::push-type",
         "publics_scp::get-resp-por-ids",
         "publics_scp::get-all-contactos-by",
         "publics_scp::get-orden-by-id",

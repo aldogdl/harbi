@@ -12,7 +12,7 @@ class TerminalSkel extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Container(
-      margin: const EdgeInsets.all(5),
+      margin: const EdgeInsets.only(right: 5),
       padding: const EdgeInsets.all(8),
       color: Colors.black,
       child: child

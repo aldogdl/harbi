@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:harbi/src/config/globals.dart';
-import 'package:harbi/src/config/sng_manager.dart';
-import 'package:harbi/src/services/get_paths.dart';
-import 'package:harbi/src/widgets/multi_conn_ok.dart';
 import 'package:provider/provider.dart';
 
+import '../../config/globals.dart';
+import '../../config/sng_manager.dart';
+import '../../config/my_theme.dart';
 import '../../librerias/a_init_shell/get_ip.dart';
+import '../../librerias/a_init_shell/test_conn.dart';
+import '../../services/get_paths.dart';
+import '../../providers/terminal_provider.dart';
+import '../../widgets/multi_conn_ok.dart';
 import '../../widgets/terminal_skel.dart';
 import '../../widgets/txt_terminal.dart';
-import '../../config/my_theme.dart';
 import '../../widgets/ask_by_ip.dart';
-import '../../librerias/a_init_shell/test_conn.dart';
-import '../../providers/terminal_provider.dart';
 
 class InitShell extends StatefulWidget {
 
@@ -24,6 +24,7 @@ class InitShell extends StatefulWidget {
 class _InitShellState extends State<InitShell> {
 
   final List<Map<String, dynamic>> _multiConn = [];
+  final globals = getSngOf<Globals>();
 
   @override
   void initState() {
@@ -57,7 +58,6 @@ class _InitShellState extends State<InitShell> {
   Future<void> _initWidget(_) async {
 
     final tprod = context.read<TerminalProvider>();
-    final globals = getSngOf<Globals>();
 
     tprod.accs = [];
     tprod.setAccs(''.padRight(tprod.lenTxt, '-'));
@@ -67,19 +67,43 @@ class _InitShellState extends State<InitShell> {
 
     _checkConnRemota(tprod).then((isOk) async {
 
+      final tprod = context.read<TerminalProvider>();
+
       if(!isOk) {
         tprod.setAccs('[X] NO HAY CONEXIÓN con AUTOPARNET.COM');
         await Future.delayed(const Duration(milliseconds: 1000));
         tprod.setAccs('[!] Probaré con la conexión Local');
-        await Future.delayed(const Duration(milliseconds: 3000));
+        await Future.delayed(const Duration(milliseconds: 2750));
       }
 
       tprod.setAccs('> Buscando IPs del Sistema');
+      await Future.delayed(const Duration(milliseconds: 250));
+
       Map<String, dynamic> ips = await GetIp.search();
 
       tprod.setAccs('[ok] Nombre de la RED: ${ips['wifiName']}');
       globals.wifiName = ips['wifiName'];
       await Future.delayed(const Duration(milliseconds: 250));
+
+      if(ips.containsKey('recovery')) {
+        globals.ipHarbi = ips['recovery']['local'];
+        final res = await TestConn.local(tprod);
+        globals.ipHarbi = '';
+        if(res == 'ok') {
+          globals.ipHarbi  = ips['recovery']['ipHarbi'];
+          globals.typeConn = ips['recovery']['typeConx'];
+          globals.bdRemota = ips['recovery']['remoto'];
+          globals.bdLocal  = ips['recovery']['local'];
+          tprod.setAccs('[√] HARBI IP: ${globals.ipHarbi} ACTUAL');
+          tprod.secc = 'checkFileSys';
+          return;
+        }
+        if(!ips.containsKey('interfaces')) {
+          tprod.setAccs('[X] NO HAY CONEXIÓN A SL.');
+          await Future.delayed(const Duration(milliseconds: 1000));
+          return;
+        }
+      }
 
       final mainConn = List<Map<String, dynamic>>.from(ips['interfaces']);
 
@@ -125,7 +149,9 @@ class _InitShellState extends State<InitShell> {
       }
 
       if(globals.ipHarbi.isNotEmpty) {
+        await GetPaths.setDataConectionLocal();
         tprod.setAccs('[√] HARBI IP: ${globals.ipHarbi} ACTUAL');
+        await Future.delayed(const Duration(milliseconds: 500));
         tprod.secc = 'checkFileSys';
       }else{
         tprod.setAccs('[!] y presione Refrescar Sistema.');
@@ -214,6 +240,5 @@ class _InitShellState extends State<InitShell> {
       AskByIp(tipo: tipo, tprov: context.read<TerminalProvider>())
     );
   }
-
 
 }
