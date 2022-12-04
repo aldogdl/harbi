@@ -39,7 +39,6 @@ class CentinelaScpApi  extends GetView  {
 
     final Map<String?, String?>? params = cntx.request.params;
     String query = '';
-    
     if(params != null) {
       if(params.containsKey('fnc')) {
         query = params['fnc']!;
@@ -49,11 +48,12 @@ class CentinelaScpApi  extends GetView  {
     
     if(query.isNotEmpty) { _speelQuery(query); }
     if(fnc['fnc'].isNotEmpty) {
-
+      
       switch (fnc['fnc']) {
         case 'get_metrix_of_file' : return await _getMetrixOfFile(); // Borrar
         case 'get_metrix_by_orden': return await _getMetrixByIdOrdenAndIdCamp();
         case 'get_iris_by_orden'  : return await _getIrisByIdOrden();
+        case 'get_resp_by_ids'  : return await _getRespuestasByIds();
         default:
           return _unknowFnc();
       }
@@ -339,6 +339,51 @@ class CentinelaScpApi  extends GetView  {
         }
       }
     }
+    return result;
+  }
+
+  ///
+  Future<Map<String, dynamic>> _getRespuestasByIds() async {
+
+    // Ej Query = get_resp_by_ids=idsVarias;
+    // idsVarias= idOrd[i]idPza[i]idResp[i]idCot
+
+    final s = GetPaths.getSep();
+    final partes = fnc['query'].toString().split('i');
+    _setResult(false, '');
+    if(partes.isEmpty) {
+      return result;
+    }
+
+    // Saber el path del expediente de la orden.
+    final pathEx = getFolderExpedienteByIdOrden(partes.first);
+    
+    result['body'] = {};
+    if(pathEx.isNotEmpty) {
+      final exp = File('$pathEx$s${"orden.json"}');
+      if(exp.existsSync()) {
+
+        final expC = Map<String, dynamic>.from(json.decode(exp.readAsStringSync()));
+        
+        if(expC.containsKey('piezas')) {
+
+          final piezas = List<Map<String, dynamic>>.from(expC['piezas']);
+          if(piezas.isNotEmpty) {
+            final pieza = piezas.where((p) => '${p['id']}' == partes[1]);
+            if(pieza.isNotEmpty) {
+              if(pieza.first.containsKey('rsps')) {
+                final resPz = List<Map<String, dynamic>>.from(pieza.first['rsps']);
+                final pzF = resPz.where((r) {
+                  return ('${r['id']}' == partes[2] && '${r['own']}' == partes[3]);
+                });
+                if(pzF.isNotEmpty) { result['body'] = pzF.first; }
+              }
+            }
+          }
+        }
+      }
+    }
+
     return result;
   }
 
