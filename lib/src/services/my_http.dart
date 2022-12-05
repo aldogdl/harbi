@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../config/sng_manager.dart';
 import '../config/globals.dart';
 import 'get_paths.dart';
+import 'log/i_log.dart';
 
 class MyHttp {
   
@@ -39,6 +40,10 @@ class MyHttp {
       await get(uri);
       return (result['body'] != 'ok') ? 'no' : uri;
     } catch (e) {
+      Ilog(
+        StackTrace.current, acc: 'Realizando Conexión con $uri',
+        res: e.toString()
+      );
       return 'er';
     }
   }

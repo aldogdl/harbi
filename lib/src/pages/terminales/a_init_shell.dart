@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -8,6 +10,7 @@ import '../../librerias/a_init_shell/get_ip.dart';
 import '../../librerias/a_init_shell/test_conn.dart';
 import '../../services/get_paths.dart';
 import '../../providers/terminal_provider.dart';
+import '../../services/log/i_log.dart';
 import '../../widgets/multi_conn_ok.dart';
 import '../../widgets/terminal_skel.dart';
 import '../../widgets/txt_terminal.dart';
@@ -25,6 +28,8 @@ class _InitShellState extends State<InitShell> {
 
   final List<Map<String, dynamic>> _multiConn = [];
   final globals = getSngOf<Globals>();
+  bool connRemota = false;
+  bool connLocal = false;
 
   @override
   void initState() {
@@ -65,24 +70,29 @@ class _InitShellState extends State<InitShell> {
     tprod.setAccs(''.padRight(tprod.lenTxt, '-'));
     await Future.delayed(const Duration(milliseconds: 2000));
 
+    Ilog(StackTrace.current, acc: 'init');
     _checkConnRemota(tprod).then((isOk) async {
 
       final tprod = context.read<TerminalProvider>();
 
+      connRemota = true;
       if(!isOk) {
+        connRemota = false;
         tprod.setAccs('[X] NO HAY CONEXIÓN con AUTOPARNET.COM');
-        await Future.delayed(const Duration(milliseconds: 1000));
-        tprod.setAccs('[!] Probaré con la conexión Local');
-        await Future.delayed(const Duration(milliseconds: 2750));
+        tprod.setAccs('[!] Probando conexión Local');
+        await Future.delayed(const Duration(milliseconds: 4000));
       }
 
       tprod.setAccs('> Buscando IPs del Sistema');
       await Future.delayed(const Duration(milliseconds: 250));
+      Ilog(StackTrace.current, acc: 'Probando conexión LOCAL');
 
       Map<String, dynamic> ips = await GetIp.search();
-
+      
       tprod.setAccs('[ok] Nombre de la RED: ${ips['wifiName']}');
-      globals.wifiName = ips['wifiName'];
+      Ilog(
+        StackTrace.current, acc: 'Buscando las IPS de conexión', res: json.encode(ips)
+      );
       await Future.delayed(const Duration(milliseconds: 250));
 
       if(ips.containsKey('recovery')) {
@@ -148,16 +158,43 @@ class _InitShellState extends State<InitShell> {
         }
       }
 
+      Map<String, dynamic> resC = {
+        'ipHarbi': globals.ipHarbi,
+        'typeConn': globals.typeConn,
+        'bdLocal': globals.bdLocal,
+        'result' : ''
+      };
+
       if(globals.ipHarbi.isNotEmpty) {
+
         await GetPaths.setDataConectionLocal();
+        resC['result'] = '[√] HARBI IP: ${globals.ipHarbi} ACTUAL';
+
         tprod.setAccs('[√] HARBI IP: ${globals.ipHarbi} ACTUAL');
         await Future.delayed(const Duration(milliseconds: 500));
-        tprod.secc = 'checkFileSys';
+        connLocal = true;
+        if(!connRemota) {
+          tprod.setAccs('[!] refresca a HARBI para probar otra ves.');
+          tprod.setAccs('[!] y repara el problema, al hacerlo.');
+          tprod.setAccs('[!] revisa el archivo log de seguimiento');
+          tprod.setAccs('[!] una conexión exitosa a SR.');
+          tprod.setAccs('[!] HARBI NO puede continuar sin ');
+          resC['result'] = '[!] HARBI NO puede continuar sin una conexión a SR.';
+        }
+
       }else{
         tprod.setAccs('[!] y presione Refrescar Sistema.');
         tprod.setAccs('[!] inténte reparar la conexión');
         tprod.setAccs('[!] una conexión local a la RED.');
         tprod.setAccs('[!] HARBI NO puede continuar sin ');
+        resC['result'] = '[!] HARBI NO puede continuar sin una conexión local a la RED.';
+        connLocal = false;
+      }
+      Ilog(
+        StackTrace.current, acc: 'Buscando las IPS de conexión', res: json.encode(resC)
+      );
+      if(connLocal && connRemota) {
+        tprod.secc = 'checkFileSys';
       }
     });
   }

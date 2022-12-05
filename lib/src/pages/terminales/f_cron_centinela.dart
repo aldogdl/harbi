@@ -7,6 +7,7 @@ import '../../config/globals.dart';
 import '../../providers/socket_conn.dart';
 import '../../providers/terminal_provider.dart';
 import '../../services/get_paths.dart';
+import '../../services/log/i_log.dart';
 import '../../widgets/terminal_skel.dart';
 import '../../widgets/txt_terminal.dart';
 
@@ -131,6 +132,10 @@ class _CronCentinelaState extends State<CronCentinela> {
     bool isLoc = (_globals.env == 'dev') ? true : false;
     if(_tprov.uriCheckCron.isEmpty) {
       _tprov.uriCheckCron = await GetPaths.getUri('check_changes', isLocal: isLoc);
+      Ilog(
+        StackTrace.current, acc: 'Path para checar cambios en el servidor',
+        res: _tprov.uriCheckCron
+      );
     }
 
     if(mounted) {

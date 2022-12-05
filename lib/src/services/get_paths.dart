@@ -11,8 +11,6 @@ class GetPaths {
 
   static final Globals globals = getSngOf<Globals>();
 
-  static String env = 'dev';
-
   static const String package = 'autoparnet';
   static const String userShare = '_userPc_';
   static const String nameFilePaths = 'paths_dev.json';
@@ -235,7 +233,7 @@ class GetPaths {
   ///
   static Future<String> getDominio({bool isLocal = true}) async {
 
-    isLocal = (env == 'dev') ? true : isLocal;
+    isLocal = (globals.env == 'dev') ? true : isLocal;
     
     final paths = await _getFromFilePathsProd('portServer');
     return (isLocal) ? paths['base_l'] : paths['base_r'];
@@ -244,7 +242,7 @@ class GetPaths {
   ///
   static Future<Map<String, dynamic>> getConnectionFtp({bool isLocal = true}) async {
 
-    isLocal = (env == 'dev') ? true : isLocal;
+    isLocal = (globals.env == 'dev') ? true : isLocal;
 
     final pathDt = await _getFromFilePathsProd('ftp');
     String sufix = (isLocal) ? 'l' : 'r';
@@ -300,7 +298,7 @@ class GetPaths {
   ///
   static Future<String> getUri(String uri, {bool isLocal = true}) async {
 
-    isLocal = (env == 'dev') ? true : isLocal;
+    isLocal = (globals.env == 'dev') ? true : isLocal;
 
     Map<String, dynamic> uriPath = await _getFromFilePathsProd(uri);
     String base = '${uriPath['base_l']}${uriPath['uri']}/';
@@ -318,9 +316,8 @@ class GetPaths {
   }
 
   ///
-  static Future<String> getPathToLogoMarcaOf(String marca,
-    {bool isLocal = true}
-  ) async {
+  static Future<String> getPathToLogoMarcaOf(String marca, {bool isLocal = true}) async {
+    
     const carpeta = 'mrks_logos/';
     final dom = await getDominio(isLocal: isLocal);
     return '$dom$carpeta$marca';
