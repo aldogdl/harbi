@@ -74,7 +74,6 @@ class HarbiFTP {
       }else{
         prov.setAccs('[√] Descarga HTTP exitosa');
         file.writeAsStringSync(json.encode(centi));
-        await setVersionOnGlobals();
       }
     }
 

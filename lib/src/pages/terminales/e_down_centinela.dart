@@ -61,7 +61,9 @@ class _DownCentinelaState extends State<DownCentinela> {
     if(resp == 'err') {
       tprod.setAccs('[X] Archivo Centinela no existe o error en Descarga');
     }else{
-      
+
+      tprod.setAccs('[√] GUARDANOD NUEVA VERSION.');
+      await HarbiFTP.setVersionOnGlobals();
       tprod.setAccs('[√] DESCARGA EXITOSA.');
       // Enviar una notificacion a todos de actualizar centinela.
       // al actualizar cada SCP el centinela, solo debe revisar si hay nuevas
@@ -81,6 +83,7 @@ class _DownCentinelaState extends State<DownCentinela> {
       HarbiFTP.oldCenti = {};
     }
     
+    tprod.waitIsWorking = false;
     tprod.secc = 'cron';
   }
 

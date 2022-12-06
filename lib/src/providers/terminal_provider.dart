@@ -91,6 +91,7 @@ class TerminalProvider extends ChangeNotifier {
   
   /// Para saber si es necesario checar filtros, resp, see, etc
   bool hasMisselanius = false;
+  bool waitIsWorking  = false;
 
   ///
   Future<void> cronStart() async {
@@ -131,6 +132,7 @@ class TerminalProvider extends ChangeNotifier {
   ///
   Future<void> _revisarServer() async {
 
+    if(waitIsWorking){ return; }
     String pad(String val) => val.padLeft(2, '0');
 
     if(_globals.versionCentinela.isNotEmpty) {
@@ -142,7 +144,8 @@ class TerminalProvider extends ChangeNotifier {
         lastCheck  = ti;
         cantChecks = cantChecks +1;
         setAccs('> [ Día: ${ti.day} | Hora: ${ pad('${ti.hour}') }:${ pad('${ti.minute}') }:${ pad('${ti.second}') } ] #$cantChecks');
-        
+        waitIsWorking = true;
+        setAccs('[!] PAUSADO TEMPORAL');
         final has = await TaskFromServer.checkCambionEnCentinela(uriCheckCron);
         if(has.containsKey('err')) {
 
@@ -167,9 +170,9 @@ class TerminalProvider extends ChangeNotifier {
           // see, resps, noTengo, campañas etc...
           if(hasMisselanius) {
             hasMisselanius = false;
-            setIsPausado(true);
             await ChangesMisselanius.check(this);
-            setIsPausado(false);
+            setAccs('[!] REANUDANDO CRON');
+            waitIsWorking = false;
           }
         }
       }
