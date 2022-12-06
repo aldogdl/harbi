@@ -169,13 +169,13 @@ class TaskFromServer {
       await MyHttp.post(uri, {'key':_globals.swh, 'conx':data});
 
       if(!MyHttp.result['abort']) {
-        Map<String, dynamic> conn = await GetPaths.getContentFileOf('harbiconnxl');
+        Map<String, dynamic> conn = await GetPaths.getContentFileOf('harbi_connx');
         if(!conn.containsKey(_globals.swh)) {
           conn.putIfAbsent(_globals.swh, () => data);
         }else{
           conn[_globals.swh] = data;
         }
-        final path = await GetPaths.getFileByPath('harbiconnxl');
+        final path = await GetPaths.getFileByPath('harbi_connx');
         final file = File(path);
         file.writeAsStringSync(json.encode(conn));
       }

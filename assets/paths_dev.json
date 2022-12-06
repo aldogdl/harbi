@@ -1,5 +1,5 @@
 {
-    "ver": "35",
+    "ver": "36",
     "palcla": "0",
     "portadas":10,
     "portHarbi": 0,
@@ -33,7 +33,6 @@
     "files": {
         "testings": "folders_base::testings_scm.json",
         "swh": "folders_base::swh.txt",
-        "harbiconnxl": "folders_base::harbi_connx.json",
         "notengo": "folders_base::share::filnotgo.json",
         "opcotizo": "folders_base::share::opcotizo.json",
         "harbi_connx": "folders_base::share::harbi_connx.json",

@@ -94,7 +94,7 @@ class _InitShellState extends State<InitShell> {
         StackTrace.current, acc: 'Buscando las IPS de conexión', res: json.encode(ips)
       );
       await Future.delayed(const Duration(milliseconds: 250));
-
+      
       if(ips.containsKey('recovery')) {
         globals.ipHarbi = ips['recovery']['local'];
         final res = await TestConn.local(tprod);
