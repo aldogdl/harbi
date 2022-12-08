@@ -82,9 +82,9 @@ class ChangesMisselanius {
             goForIris = _changes[i]['iris'];
           }
         }
-        // resp
-        if(_changes[i].containsKey('scmResp')) {
-          goForScmResp = _changes[i]['scmResp'];
+
+        if(_changes[i].containsKey('resp')) {
+          goForScmResp = _changes[i]['resp'];
         }
       } 
     }
@@ -95,7 +95,7 @@ class ChangesMisselanius {
       await Future.delayed(const Duration(milliseconds: 250));
       await _hasCampaniasNew(prov);
     }
-    
+
     if(goForIris) {
       hasChanges = true;
       prov.setAccs('> REGISTROS DE ATENCIÓN...');
@@ -145,8 +145,14 @@ class ChangesMisselanius {
     final path = GetPaths.getPathRoot();
     final f = File('$path${ GetPaths.getSep() }open_iris.log');
     if(!f.existsSync()) {
+      // Creamos el archivo para evitar abrir la VP nuevamente
+      f.writeAsStringSync('');
       prov.setAccs('> Iniciando proceso [IRISTOTAL]');
-      RunExe.start('iristotal', args: [globals.env]);
+      List<String> argumentos = [];
+      if(globals.env == 'dev') {
+        argumentos = [globals.env];
+      }
+      RunExe.start('iristotal', args: argumentos);
     }else{
       prov.setAccs('> Notificando a [IRISTOTAL]');
       final filename = 'atencion-${DateTime.now().millisecondsSinceEpoch}.txt';
@@ -161,7 +167,11 @@ class ChangesMisselanius {
   static Future<void> _goForScmResp(TerminalProvider prov) async {
 
     prov.setAccs('> Iniciando proceso [REGSCMRESP]');
-    RunExe.start('regScmResp', args: [globals.env]);
+    List<String> argumentos = [];
+    if(globals.env == 'dev') {
+      argumentos = [globals.env];
+    }
+    RunExe.start('regScmResp', args: argumentos);
   }
 
   /// Revisamos si hay nuevas campañas
@@ -169,7 +179,11 @@ class ChangesMisselanius {
 
     if(_campas) {
       prov.setAccs('> Iniciando proceso [NEWCAMPAS]');
-      RunExe.start('newcampas', args: [globals.env]);
+      List<String> argumentos = [];
+      if(globals.env == 'dev') {
+        argumentos = [globals.env];
+      }
+      RunExe.start('newcampas', args: argumentos);
       _campas = false;
     }else{
       prov.setAccs('[!] Sin nuevas CAMPAÑAS');

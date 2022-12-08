@@ -47,6 +47,7 @@ class LogoAndActions extends StatelessWidget {
                   Future.delayed(const Duration(milliseconds: 500), (){
                     tProv.accs = [];
                     tProv.secc = 'refresh';
+                    tProv.waitIsWorking = false;
                   });
                 }
               ),

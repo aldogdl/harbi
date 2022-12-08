@@ -82,7 +82,7 @@ class _DownCentinelaState extends State<DownCentinela> {
       ChangesCentinela.dispose();
       HarbiFTP.oldCenti = {};
     }
-    
+
     tprod.waitIsWorking = false;
     tprod.secc = 'cron';
   }

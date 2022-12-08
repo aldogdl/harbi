@@ -144,8 +144,8 @@ class TerminalProvider extends ChangeNotifier {
         lastCheck  = ti;
         cantChecks = cantChecks +1;
         setAccs('> [ Día: ${ti.day} | Hora: ${ pad('${ti.hour}') }:${ pad('${ti.minute}') }:${ pad('${ti.second}') } ] #$cantChecks');
+        
         waitIsWorking = true;
-        setAccs('[!] PAUSADO TEMPORAL');
         final has = await TaskFromServer.checkCambionEnCentinela(uriCheckCron);
         if(has.containsKey('err')) {
 
@@ -163,17 +163,20 @@ class TerminalProvider extends ChangeNotifier {
         if(has['centinela']) {
           // Hay cambios en el centinela, procesamos los miselanius despues
           // de descargar el nuevo archivo.
+          setAccs('[!] PAUSADO TEMPORAL');
           setAccs('[!] Detectada nueva versión...');
           secc = 'downCent';
+          
         }else{
           // No hay cambios en el centinela, pero si en otros elementos
           // see, resps, noTengo, campañas etc...
           if(hasMisselanius) {
             hasMisselanius = false;
+            setAccs('[!] PAUSADO TEMPORAL');
             await ChangesMisselanius.check(this);
             setAccs('[!] REANUDANDO CRON');
-            waitIsWorking = false;
           }
+          waitIsWorking = false;
         }
       }
 
