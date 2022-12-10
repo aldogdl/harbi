@@ -347,6 +347,7 @@ class CentinelaScpApi  extends GetView  {
 
     // Ej Query = get_resp_by_ids=idsVarias;
     // idsVarias= idOrd[i]idPza[i]idResp[i]idCot
+    // Ej. 210i1i1i6
 
     final s = GetPaths.getSep();
     final partes = fnc['query'].toString().split('i');
@@ -357,7 +358,7 @@ class CentinelaScpApi  extends GetView  {
 
     // Saber el path del expediente de la orden.
     final pathEx = getFolderExpedienteByIdOrden(partes.first);
-    
+
     result['body'] = {};
     if(pathEx.isNotEmpty) {
       final exp = File('$pathEx$s${"orden.json"}');
@@ -371,8 +372,8 @@ class CentinelaScpApi  extends GetView  {
           if(piezas.isNotEmpty) {
             final pieza = piezas.where((p) => '${p['id']}' == partes[1]);
             if(pieza.isNotEmpty) {
-              if(pieza.first.containsKey('rsps')) {
-                final resPz = List<Map<String, dynamic>>.from(pieza.first['rsps']);
+              if(pieza.first.containsKey('resps')) {
+                final resPz = List<Map<String, dynamic>>.from(pieza.first['resps']);
                 final pzF = resPz.where((r) {
                   return ('${r['id']}' == partes[2] && '${r['own']}' == partes[3]);
                 });

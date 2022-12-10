@@ -1,5 +1,5 @@
 {
-    "ver": "36",
+    "ver": "37",
     "palcla": "0",
     "portadas":10,
     "portHarbi": 0,
@@ -102,7 +102,6 @@
         "publics_harbi::get-resp-centinela",
         "publics_harbi::set-regs-byids",
         "publics_harbi::get-regs-push-see-byids",
-        "publics_harbi::set-new-campaing",
         "publics_harbi::set-ests-stts",
         "publics_harbi::get-regs-receivers-by-id-camp",
         "publics_harbi::push-finish-camp",

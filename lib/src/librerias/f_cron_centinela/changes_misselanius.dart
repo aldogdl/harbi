@@ -51,6 +51,8 @@ class ChangesMisselanius {
           file.deleteSync();
         }
 
+        // Estos archivos indican que hay que enviar notificaciones push via FireBase
+        // Generalmente usados para avisar a los cotizadores que hay nuevas solicitudes
         if(lst[i].path.contains('fire_push')) {
           final file = File(lst[i].path);
           final content = _checkDuplex(file);
@@ -142,24 +144,27 @@ class ChangesMisselanius {
   static Future<void> _goForIris(TerminalProvider prov) async {
 
     // Revisamos si ya esta abierto iris total.
-    final path = GetPaths.getPathRoot();
-    final f = File('$path${ GetPaths.getSep() }open_iris.log');
+    final fld = GetPaths.getPathsFolderTo('logs');
+    if(fld == null) return;
+
+    final f = File('${fld.path}${ GetPaths.getSep() }open_iris.log');
     if(!f.existsSync()) {
-      // Creamos el archivo para evitar abrir la VP nuevamente
-      f.writeAsStringSync('');
       prov.setAccs('> Iniciando proceso [IRISTOTAL]');
       List<String> argumentos = [];
       if(globals.env == 'dev') {
         argumentos = [globals.env];
       }
+      // Creamos el archivo para evitar abrir la VP nuevamente
+      f.writeAsStringSync('');
       RunExe.start('iristotal', args: argumentos);
     }else{
       prov.setAccs('> Notificando a [IRISTOTAL]');
-      final filename = 'atencion-${DateTime.now().millisecondsSinceEpoch}.txt';
-      final fld = GetPaths.getPathsFolderTo('logs');
-      if(fld != null) {
-        File('${fld.path}${ GetPaths.getSep() }$filename').writeAsStringSync('');
-      }
+      final filename = 'atencion-${DateTime.now().millisecondsSinceEpoch}.log';
+      File('${fld.path}${ GetPaths.getSep() }$filename').writeAsStringSync(
+        'Estos archivos, son creados desde HARBI, y son para indicar que hay '
+        'más archivos de atencion en el servidor remoto para descargar.'
+        'Esto se hizo con la finalidad de no abrir tantos VP de IRISTOTAL.'
+      );
     }
   }
 
@@ -178,12 +183,30 @@ class ChangesMisselanius {
   static Future<void> _hasCampaniasNew(TerminalProvider prov) async {
 
     if(_campas) {
-      prov.setAccs('> Iniciando proceso [NEWCAMPAS]');
-      List<String> argumentos = [];
-      if(globals.env == 'dev') {
-        argumentos = [globals.env];
+
+      // Revisamos si ya esta abierto vp camp.
+      final fld = GetPaths.getPathsFolderTo('logs');
+      if(fld == null) return;
+
+      final f = File('${fld.path}${ GetPaths.getSep() }open_camp.log');
+      if(!f.existsSync()) {
+        prov.setAccs('> Iniciando proceso [NEWCAMPAS]');
+        List<String> argumentos = [];
+        if(globals.env == 'dev') {
+          argumentos = [globals.env];
+        }
+        // Creamos el archivo para evitar abrir la VP nuevamente
+        f.writeAsStringSync('');
+        RunExe.start('newcampas', args: argumentos);
+      }else{
+        prov.setAccs('> Notificando a [NEWCAMPAS]');
+        final filename = 'newcamp-${DateTime.now().millisecondsSinceEpoch}.log';
+        File('${fld.path}${ GetPaths.getSep() }$filename').writeAsStringSync(
+          'Estos archivos, son creados desde HARBI, y son para indicar que hay '
+          'más archivos de nuevas campañas en el servidor remoto para descargar.'
+          'Esto se hizo con la finalidad de no abrir tantos VP de NEWCAMPAS.'
+        );
       }
-      RunExe.start('newcampas', args: argumentos);
       _campas = false;
     }else{
       prov.setAccs('[!] Sin nuevas CAMPAÑAS');

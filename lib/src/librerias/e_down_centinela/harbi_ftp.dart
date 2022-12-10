@@ -57,26 +57,39 @@ class HarbiFTP {
     }
 
     Map<String, dynamic> centi = {};
-    if(globals.env != 'dev') {
-      result = await _downFileFtp(pathFileDown, toPath);
-    }
+    // if(globals.env != 'dev') {
+    //   result = await _downFileFtp(pathFileDown, toPath);
+    // }
 
-    if(result == 0) {
+    // if(result == 0) {
+    //   prov.setAccs('> Recuperando Schema Centinela.');
+    //   await Future.delayed(const Duration(milliseconds: 250));
+    //   centi = await _buildCentinelaViaHttp(pathFileDown, toPath, prov);
+    // }
+
+    centi = await _downFileHttp(pathFileDown, 'download_centinela');
+    if(centi.isEmpty) {
       prov.setAccs('> Recuperando Schema Centinela.');
-      await Future.delayed(const Duration(milliseconds: 250));
       centi = await _buildCentinelaViaHttp(pathFileDown, toPath, prov);
+    }else{
+      prov.setAccs('[√] Descarga HTTP exitosa');
+      file.writeAsStringSync(json.encode(centi));
     }
-
+    
+    // Esta es por si fallo la descarga del centinela via FTP
     if(result == 3) {
       centi = await _downFileHttp(pathFileDown, 'download_centinela');
       if(centi.isEmpty) {
-        prov.setAccs('[X] ERROR de Descarga TOTAL');
+        prov.setAccs('> Recuperando Schema Centinela.');
+        centi = await _buildCentinelaViaHttp(pathFileDown, toPath, prov);
       }else{
         prov.setAccs('[√] Descarga HTTP exitosa');
         file.writeAsStringSync(json.encode(centi));
       }
     }
 
+    // Si la descarga via FTP fue exitosa, volvemos a cargar el contenido desde
+    // el archivo.
     if(result == 4) {
       final inFile = file.readAsStringSync();
       if(inFile.isNotEmpty) {
