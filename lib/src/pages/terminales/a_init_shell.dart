@@ -96,18 +96,32 @@ class _InitShellState extends State<InitShell> {
       await Future.delayed(const Duration(milliseconds: 250));
       
       if(ips.containsKey('recovery')) {
-        globals.ipHarbi = ips['recovery']['local'];
+        globals.ipHarbi = '';
+        bool formatLocal = false;
+        if(ips['recovery']['local'].contains('_ip_')) {
+          if(ips['recovery']['ipHarbi'].contains('.')) {
+            globals.ipHarbi = ips['recovery']['ipHarbi'];
+            formatLocal = true;
+          }
+        }else{
+          globals.ipHarbi = ips['recovery']['local'];
+        }
         final res = await TestConn.local(tprod);
         globals.ipHarbi = '';
         if(res == 'ok') {
           globals.ipHarbi  = ips['recovery']['ipHarbi'];
           globals.typeConn = ips['recovery']['typeConx'];
           globals.bdRemota = ips['recovery']['remoto'];
-          globals.bdLocal  = ips['recovery']['local'];
+          if(formatLocal) {
+            globals.bdLocal = 'http://${globals.ipHarbi}:${globals.portdb}/autoparnet/public_html/';
+          }else{
+            globals.bdLocal  = ips['recovery']['local'];
+          }
           tprod.setAccs('[√] HARBI IP: ${globals.ipHarbi} ACTUAL');
           tprod.secc = 'checkFileSys';
           return;
         }
+
         if(!ips.containsKey('interfaces')) {
           tprod.setAccs('[X] NO HAY CONEXIÓN A SL.');
           await Future.delayed(const Duration(milliseconds: 1000));

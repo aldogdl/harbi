@@ -1,5 +1,5 @@
 {
-    "ver": "37",
+    "ver": "38",
     "palcla": "0",
     "portadas":10,
     "portHarbi": 0,
@@ -23,11 +23,8 @@
         "udel": "udel",
         "ordenes": "ords",
         "scm_tray": "scm_tray",
-        "scm_werr": "scm_werr",
-        "scm_hist": "scm_hist",
         "scm_await": "scm_await",
         "scm_sended": "scm_sended",
-        "scm_drash": "scm_drash",
         "scm_msgs": "scm_msgs"
     },
     "files": {

@@ -1,8 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 
-import 'package:harbi/src/repository/fire_push_repository.dart';
-
+import '../../repository/fire_push_repository.dart';
 import '../run_exe.dart';
 import '../../config/globals.dart';
 import '../../config/sng_manager.dart';

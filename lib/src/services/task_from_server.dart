@@ -236,17 +236,15 @@ class TaskFromServer {
         }
       }
 
-      if(!save) {
-        final logs = GetPaths.getPathsFolderTo('logs');
-        if(logs != null) {
-          final lst = logs.listSync().toList();
-          if(lst.isNotEmpty) {
-            for (var i = 0; i < lst.length; i++) {
-              if(lst[i].path.contains('fire_push')) {
-                r['firepush'] = true;
-                save = true;
-                break;
-              }
+      final logs = GetPaths.getPathsFolderTo('logs');
+      if(logs != null) {
+        final lst = logs.listSync().toList();
+        if(lst.isNotEmpty) {
+          for (var i = 0; i < lst.length; i++) {
+            if(lst[i].path.contains('fire_push')) {
+              r['firepush'] = true;
+              save = true;
+              break;
             }
           }
         }
