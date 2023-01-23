@@ -5,8 +5,8 @@ import '../entity/conectado.dart';
 
 class Globals {
 
-  String harbiV  = '2.0.1';
-  String env  = 'dev';
+  String harbiV  = '2.0.2';
+  String env  = 'prod';
   bool debug = true;
   // Colocar valor en segundos
   int revCada = 8;

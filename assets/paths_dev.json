@@ -1,5 +1,5 @@
 {
-    "ver": "38",
+    "ver": "39",
     "palcla": "0",
     "portadas":10,
     "portHarbi": 0,
@@ -22,9 +22,6 @@
         "harbi": "harbi",
         "udel": "udel",
         "ordenes": "ords",
-        "scm_tray": "scm_tray",
-        "scm_await": "scm_await",
-        "scm_sended": "scm_sended",
         "scm_msgs": "scm_msgs"
     },
     "files": {
@@ -36,7 +33,6 @@
         "cotizadores": "folders_base::share::cotz.json",
         "firepush": "folders_base::share::fire_push.json",
         "centinela": "folders_base::share::centinela.json",
-        "scmHtml": "folders_base::share::scmHtml.json",
         "connpass": "folders_base::share::connpass.json",
         "connwho": "folders_base::share::connwho.json",
         "cargos": "folders_base::share::cargos.json",
